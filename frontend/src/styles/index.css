@@ -1,0 +1,272 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Compatibility Fixes */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  input,
+  button,
+  select,
+  textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: block;
+  }
+}
+
+/* Prevent horizontal scrolling and ensure media scale within viewport */
+@layer base {
+  html, body { max-width: 100%; overflow-x: hidden; }
+  img, video, canvas, svg { max-width: 100%; height: auto; }
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply min-h-screen bg-slate-950 text-slate-100 font-sans;
+  background-image: radial-gradient(circle at top right, rgba(99, 102, 241, 0.18), transparent 25%),
+    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.12), transparent 22%);
+}
+
+/* Light mode inversion: dark text on off-white surfaces; keep accents */
+:root.light-mode body,
+.light-mode body {
+  @apply bg-slate-50 text-slate-900;
+  background-image: radial-gradient(circle at top right, rgba(99, 102, 241, 0.06), transparent 25%),
+    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.05), transparent 22%);
+}
+
+
+:root.light-mode .glass-card,
+.light-mode .glass-card {
+  @apply bg-white/90 border-slate-200;
+}
+
+/* Improve label/help text contrast inside glass cards on light mode */
+:root.light-mode .glass-card :where(.text-slate-300),
+.light-mode .glass-card :where(.text-slate-300) { color: theme('colors.slate.700'); }
+:root.light-mode .glass-card :where(.text-slate-400),
+.light-mode .glass-card :where(.text-slate-400) { color: theme('colors.slate.600'); }
+:root.light-mode .glass-card :where(.text-slate-500),
+.light-mode .glass-card :where(.text-slate-500) { color: theme('colors.slate.600'); }
+
+
+:root.light-mode .section-title,
+.light-mode .section-title {
+  @apply text-slate-900;
+}
+
+:root.light-mode .section-description,
+.light-mode .section-description {
+  @apply text-slate-600;
+}
+
+:root.light-mode .input-field,
+.light-mode .input-field {
+  @apply bg-white border-slate-200 text-slate-900 placeholder-slate-400 shadow-[0_2px_12px_rgba(2,6,23,0.06)] hover:border-slate-300;
+}
+
+/* Improve label/help text contrast inside auth cards on light mode */
+:root.light-mode .auth-card :where(.text-slate-300),
+.light-mode .auth-card :where(.text-slate-300) { color: theme('colors.slate.700'); }
+:root.light-mode .auth-card :where(.text-slate-400),
+.light-mode .auth-card :where(.text-slate-400) { color: theme('colors.slate.600'); }
+:root.light-mode .auth-card :where(.text-slate-500),
+.light-mode .auth-card :where(.text-slate-500) { color: theme('colors.slate.600'); }
+
+
+/* Placeholder color for inputs */
+.input-field::placeholder { @apply text-slate-400; }
+:root.light-mode .input-field::placeholder,
+.light-mode .input-field::placeholder { @apply text-slate-400; }
+
+
+:root.light-mode .textarea-field,
+.light-mode .textarea-field {
+  @apply bg-white border-slate-200 text-slate-900;
+}
+
+:root.light-mode .button-primary,
+.light-mode .button-primary {
+  @apply bg-gradient-to-br from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white shadow-[0_10px_24px_rgba(2,132,199,0.25)] ring-1 ring-slate-200;
+}
+
+:root.light-mode .button-secondary,
+.light-mode .button-secondary {
+  @apply border-slate-200 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-300 shadow-[0_6px_18px_rgba(2,6,23,0.05)] ring-1 ring-slate-100;
+}
+
+:root.light-mode a,
+.light-mode a {
+  @apply text-sky-600;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+
+.glass-card {
+  @apply relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_18px_50px_rgba(2,6,23,0.45)] ring-1 ring-white/10;
+}
+/* decorative subtle overlays */
+.glass-card::before {
+  content: "";
+  @apply pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-sky-500/10 blur-3xl;
+}
+.glass-card::after {
+  content: "";
+  @apply pointer-events-none absolute -bottom-28 -left-28 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl;
+}
+:root.light-mode .glass-card,
+.light-mode .glass-card {
+  @apply border-slate-200 bg-white/85 shadow-[0_12px_40px_rgba(2,6,23,0.10)] ring-1 ring-white;
+}
+
+/* Inner glass panels used inside sections */
+.glass-inner-card {
+  @apply relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_16px_44px_rgba(2,6,23,0.40)] ring-1 ring-white/10;
+}
+:root.light-mode .glass-inner-card,
+.light-mode .glass-inner-card {
+  @apply border-slate-200 bg-white/90 shadow-[0_10px_36px_rgba(2,6,23,0.10)] ring-1 ring-white;
+}
+
+/* Empty-state panel */
+.glass-empty {
+  @apply rounded-3xl border border-dashed border-white/15 bg-white/5 p-6 text-slate-400;
+}
+:root.light-mode .glass-empty,
+.light-mode .glass-empty {
+  @apply border-slate-300 bg-slate-50/85 text-slate-600;
+}
+
+
+.section-title {
+  @apply text-xl md:text-2xl font-semibold text-white;
+}
+
+.section-description {
+  @apply text-slate-300 text-sm md:text-base;
+}
+
+
+.input-field {
+  @apply w-full bg-slate-900/70 border border-slate-700/60 rounded-2xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent;
+}
+
+/* Compact select styling for prefix next to name input */
+.select-prefix {
+  @apply bg-slate-900/70 border border-slate-700/60 rounded-2xl px-3 py-2 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent w-fit;
+}
+:root.light-mode .select-prefix,
+.light-mode .select-prefix {
+  @apply bg-white border-slate-200 text-slate-900;
+}
+
+
+.textarea-field {
+  @apply min-h-[180px] w-full resize-none bg-slate-900/70 border border-slate-700/60 rounded-2xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent;
+}
+
+.button-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition-all duration-200 bg-gradient-to-br from-sky-500 to-indigo-500 hover:from-sky-400 hover:to-indigo-400 shadow-[0_8px_24px_rgba(56,189,248,0.35)] ring-1 ring-white/10 active:translate-y-[1px];
+}
+
+.button-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-slate-100 transition-all duration-200 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),_0_6px_20px_rgba(15,23,42,0.25)] ring-1 ring-white/5 active:translate-y-[1px];
+}
+
+/* Icon button for card top controls (theme/lang) */
+.icon-button {
+  @apply inline-flex items-center justify-center rounded-xl p-2 border border-white/10 bg-white/5 hover:bg-white/10 text-slate-100 ring-1 ring-white/5 transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),_0_6px_18px_rgba(15,23,42,0.25)];
+}
+
+:root.light-mode .icon-button,
+.light-mode .icon-button {
+  @apply border-slate-200 bg-white hover:bg-slate-50 text-slate-800 ring-1 ring-slate-200 shadow-[0_6px_16px_rgba(2,6,23,0.06)];
+}
+
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .drm-sandbox {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    pointer-events: none !important;
+  }
+}
+
+/* Auth glassmorphic card - stronger, modern look */
+.auth-card {
+  @apply relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_24px_60px_rgba(2,6,23,0.65)] ring-1 ring-white/10;
+}
+/* Ensure card content sits above decorative overlays */
+.auth-card > * {
+  position: relative;
+  z-index: 1;
+}
+:root.light-mode .auth-card,
+.light-mode .auth-card {
+  @apply border-slate-200 bg-white/85 shadow-[0_16px_50px_rgba(2,6,23,0.12)] ring-1 ring-white;
+}
+
+
+/* Optional subtle divider style inside auth cards */
+.card-divider {
+  @apply border-t border-white/10 mt-8 pt-6;
+}
+:root.light-mode .card-divider,
+.light-mode .card-divider {
+  @apply border-slate-200;
+}
+
+
+@media print {
+  body {
+    display: none !important;
+  }
+}

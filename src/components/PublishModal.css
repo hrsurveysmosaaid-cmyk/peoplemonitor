@@ -1,0 +1,32 @@
+/* Backdrop and modal */
+.publish-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; z-index: 50; }
+.publish-modal { width: 820px; max-width: 95vw; max-height: 90vh; overflow: auto; background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+/* Header */
+.publish-headerRow { display: flex; gap: 16px; align-items: center; margin-bottom: 12px; }
+.publish-title { margin: 0; font-size: 18px; }
+.publish-headerActions { margin-inline-start: auto; display: flex; gap: 8px; }
+.publish-btn { padding: 8px 12px; border-radius: 8px; background: #f3f4f6; border: 1px solid #e5e7eb; cursor: pointer; }
+.publish-btn--primary { background: #16a34a; border: 0; color: #fff; }
+
+/* Sections */
+.publish-section { padding: 12px; border: 1px solid #f1f5f9; border-radius: 12px; margin-bottom: 12px; }
+.publish-h3 { margin: 0 0 8px; font-size: 16px; }
+.publish-row { display: flex; gap: 12px; align-items: center; }
+.publish-rowWrap { flex-wrap: wrap; }
+.publish-mt8 { margin-top: 8px; }
+.publish-labelBlock { display: block; margin-bottom: 6px; }
+.publish-inputCol { display: flex; flex-direction: column; }
+.publish-radioLabel { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+
+/* Theme grid/cards */
+.publish-themeGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.publish-themeCard { text-align: start; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #fff; cursor: pointer; }
+.publish-themeCard.is-selected { border: 2px solid #2563EB; background: #eff6ff; }
+.publish-themeCardTitle { font-weight: 700; margin-bottom: 4px; }
+.publish-themeCardDesc { font-size: 12px; opacity: 0.9; }
+
+/* Preview */
+.publish-preview { height: 180px; padding: 16px; border-radius: 12px; overflow: hidden; position: relative; border: 1px solid #e5e7eb; }
+.publish-demoBtn { margin-top: 12px; color: #fff; border: 0; padding: 8px 12px; border-radius: 8px; }
+.publish-floatingCard { position: absolute; inset-inline-end: 12px; bottom: 12px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.5); max-width: 220px; }
