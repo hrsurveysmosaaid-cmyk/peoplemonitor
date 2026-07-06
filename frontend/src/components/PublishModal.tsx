@@ -342,7 +342,7 @@ const FontSelect: React.FC<{ id: string; value: AppFont; onChange: (v: AppFont) 
         className={`publish-control publish-fontBtn ${fontClass(value)}`}
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
-        aria-expanded={open ? 'true' : 'false'}
+        aria-expanded={open ? "true" : "false"}
         aria-controls={`${id}-listbox`}
       >
         {value}
