@@ -74,18 +74,9 @@ const deleteUser = async (req, res, next) => {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
 
-    // Cascade deletions of related records to avoid SQL constraint violations
-    await executeQuery('DELETE FROM external_live_endorsements WHERE requestor_id = ?', [userId]);
-    await executeQuery('DELETE FROM micro_success_stories WHERE user_id = ?', [userId]);
-    
-    // Get portfolios to clean experience blocks
-    const portfolios = await executeQuery('SELECT id FROM core_portfolios WHERE user_id = ?', [userId]);
-    for (const p of portfolios) {
-      await executeQuery('DELETE FROM portfolio_experience_blocks WHERE portfolio_id = ?', [p.id]);
-    }
-    await executeQuery('DELETE FROM core_portfolios WHERE user_id = ?', [userId]);
-    
-    // Finally delete user
+    // Since we set up FOREIGN KEY ON DELETE CASCADE on all related tables
+    // deleting the user will automatically clean up portfolios, experience blocks,
+    // success stories, and endorsements linked to this user.
     await GlobalUsersModel.deleteUser(userId);
 
     return res.json({ success: true, message: 'User and all associated data deleted successfully' });
