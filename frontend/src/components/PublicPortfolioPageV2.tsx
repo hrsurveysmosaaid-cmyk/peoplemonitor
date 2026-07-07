@@ -385,25 +385,31 @@ export default function PublicPortfolioPageV2() {
                     const rawE = (block as any).endDate || (block as any).date_end || '';
                     const fmt = (v: any) => {
                       if (!v) return '';
-                      const s = String(v);
-                      if (/^\d{4}-\d{2}/.test(s)) return s.slice(0,7);
-                      const d = new Date(s);
-                      return isNaN(d.getTime()) ? s : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                      const s = String(v).trim();
+                      // Non-numeric text (e.g. "now", "present") → capitalize and show as-is
+                      if (!/^\d/.test(s)) return s.charAt(0).toUpperCase() + s.slice(1);
+                      // YYYY-MM-DD or YYYY-MM → "Mon YYYY"
+                      const m = s.match(/^(\d{4})[.\-\/](\d{1,2})/);
+                      if (m) {
+                        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                        return `${months[parseInt(m[2],10)-1] || ''} ${m[1]}`;
+                      }
+                      return s;
                     };
-                    const s = fmt(rawS);
-                    const e = fmt(rawE);
-                    return s ? `${s} - ${e || t.now}` : (e || t.now);
+                    const sF = fmt(rawS);
+                    const eF = fmt(rawE);
+                    return sF ? `${sF} – ${eF || t.now}` : (eF || t.now);
                   })()}
                 </span>
               </div>
               {(block.institution_title || block.company) && (
                 <div className="text-xs inline-flex items-center gap-2 opacity-80">
                   <Briefcase size={14} />
-                  <span>{(block.institution_title || block.company) || ''}</span>
+                  <span>
+                    {block.institution_title || block.company}
+                    {(block as any).location ? `, ${(block as any).location}` : ''}
+                  </span>
                 </div>
-              )}
-              {((block as any).location) && (
-                <div className="text-xs opacity-70">{(block as any).location}</div>
               )}
             </div>
             {(() => {

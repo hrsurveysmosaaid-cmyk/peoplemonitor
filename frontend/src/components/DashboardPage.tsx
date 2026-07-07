@@ -102,6 +102,7 @@ export default function DashboardPage() {
             id: String(block.id),
             title: block.role_designation || '',
             company: block.institution_title || '',
+            location: block.location || '',
             startDate: block.date_start || '',
             endDate: block.date_end || '',
             description: block.description_narrative || '',
