@@ -513,7 +513,7 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
     const loadUsers = async () => {
       statusEl.textContent = translations[currentLang].loading;
       try {
-        const response = await fetch('/api/admin/users');
+        const response = await fetch('/api/admin/users?t=' + new Date().getTime());
         const payload = await response.json();
         if (!payload.success) {
           statusEl.textContent = payload.error || translations[currentLang].failLoad;
