@@ -32,6 +32,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const navigate = useNavigate();
 
@@ -97,6 +99,44 @@ export default function RegisterPage() {
       localStorage.setItem('userName', data.data.fullName);
       setMsg('تم تفعيل حسابك بنجاح! جاري تحويلك...');
       setTimeout(() => navigate('/dashboard'), 1000);
+    } catch (err) {
+      console.error(err);
+      setError('خطأ في الاتصال بالسيرفر');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendDisabled || !userId) return;
+    setError('');
+    setMsg('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || 'فشل في إعادة الإرسال');
+        return;
+      }
+      setMsg(data.message || 'تم إعادة إرسال رمز التحقق');
+      
+      setResendDisabled(true);
+      setCountdown(120);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setResendDisabled(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (err) {
       console.error(err);
       setError('خطأ في الاتصال بالسيرفر');
@@ -275,6 +315,16 @@ export default function RegisterPage() {
                 {loading ? (t.verifying || 'Verifying…') : (t.verify || 'Verify')}
               </button>
             </form>
+
+            <div className="mt-4 text-center">
+              <button 
+                onClick={handleResendOtp} 
+                disabled={resendDisabled || loading} 
+                className="text-indigo-500 text-sm font-semibold hover:underline disabled:opacity-50"
+              >
+                {resendDisabled ? `إعادة الإرسال بعد ${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}` : 'إعادة إرسال رمز التحقق'}
+              </button>
+            </div>
 
             <div className="mt-6 text-center">
               <button onClick={() => setShowOtp(false)} className="text-sky-400 text-sm font-semibold hover:underline">

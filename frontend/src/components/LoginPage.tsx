@@ -26,6 +26,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
 
   const safeParse = async (res: Response) => {
@@ -118,6 +120,44 @@ export default function LoginPage() {
       localStorage.setItem('userName', (data as any).data.fullName);
       setMsg('تم تفعيل حسابك بنجاح! جاري تحويلك...');
       setTimeout(() => navigate('/dashboard'), 1200);
+    } catch (err) {
+      console.error(err);
+      setError('خطأ في الاتصال بالسيرفر');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (resendDisabled || !userId) return;
+    setError('');
+    setMsg('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }) // Or email if userId isn't always available, but backend needs userId or email depending on implementation. Wait, the endpoint uses userId or user object? Wait, in RegisterPage we send userId. But here we have userId in state.
+      });
+      const data = await safeParse(res);
+      if (!res.ok) {
+        setError((data as any).error || 'فشل في إعادة الإرسال');
+        return;
+      }
+      setMsg((data as any).message || 'تم إعادة إرسال رمز التحقق');
+      
+      setResendDisabled(true);
+      setCountdown(120);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setResendDisabled(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (err) {
       console.error(err);
       setError('خطأ في الاتصال بالسيرفر');
@@ -310,6 +350,22 @@ export default function LoginPage() {
                   {loading ? (t.verifying || 'Verifying…') : (t.verify || 'Verify')}
                 </button>
               </form>
+              
+              <div className="mt-4 text-center">
+                <button 
+                  onClick={handleResendOtp} 
+                  disabled={resendDisabled || loading} 
+                  className="text-indigo-500 text-sm font-semibold hover:underline disabled:opacity-50"
+                >
+                  {resendDisabled ? `إعادة الإرسال بعد ${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}` : 'إعادة إرسال رمز التحقق'}
+                </button>
+              </div>
+
+              <div className="mt-6 text-center">
+                <button onClick={() => setShowOtp(false)} className="text-sky-400 text-sm font-semibold hover:underline">
+                  ← {t.backToLogin || 'Back to login'}
+                </button>
+              </div>
             )}
 
             <div className="mt-8 pt-6 border-t border-white/10 text-center">

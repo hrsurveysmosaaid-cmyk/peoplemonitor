@@ -15,8 +15,14 @@ let transporter;
 const initializeMailer = async () => {
   try {
     const port = parseInt(process.env.SMTP_PORT) || 465;
+    const userEmail = process.env.SMTP_USER || '';
+    const isGmail = userEmail.toLowerCase().includes('@gmail.com');
+    const defaultHost = isGmail ? 'smtp.gmail.com' : 'smtp.hostinger.com';
+
+    console.log(`[Mailer Setup] Connecting to ${process.env.SMTP_HOST || defaultHost} on port ${port} with user ${userEmail}`);
+
     transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+      host: process.env.SMTP_HOST || defaultHost,
       port: port,
       secure: port === 465, // true for 465, false for 587/25
       auth: {
