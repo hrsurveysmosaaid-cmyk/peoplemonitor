@@ -410,8 +410,8 @@ router.post('/portfolios', authenticate(), asyncHandler(async (req, res) => {
         blockType: 'work',
         institutionTitle: exp.company || '',
         roleDesignation: exp.title || '',
-                dateStart: normalizeToDate(exp.startDate),
-        dateEnd: normalizeToDate(exp.endDate),
+                dateStart: normalizeToDate(exp.startDate) || exp.startDate || null,
+        dateEnd: normalizeToDate(exp.endDate) || exp.endDate || null,
         descriptionNarrative: exp.description || '',
         attachedAssetUrl: exp.attachedAssetUrl || null,
         externalNavigationUrl: exp.externalNavigationUrl || null
@@ -442,11 +442,29 @@ router.post('/portfolios', authenticate(), asyncHandler(async (req, res) => {
     // uniqueSlugString intentionally omitted to preserve slug set above
   });
 
+  // Fetch the saved experience blocks to return their correct database IDs
+  const savedBlocks = await PortfolioExperienceBlocksModel.getExperienceBlocksByPortfolioId(portfolio.id);
+  const blocksWithStories = await Promise.all(savedBlocks.map(async (block) => {
+    const stories = await MicroSuccessStoriesModel.getSuccessStoriesByExperienceBlockId(block.id);
+    return {
+      id: String(block.id),
+      title: block.role_designation || '',
+      company: block.institution_title || '',
+      location: block.location || '',
+      startDate: block.date_start || '',
+      endDate: block.date_end || '',
+      description: block.description_narrative || '',
+      attachedAssetUrl: block.attached_asset_url || '',
+      successStory: stories && stories.length > 0 ? stories[0].story_essay_text : ''
+    };
+  }));
+
   return res.json({
     success: true,
     message: 'Portfolio draft saved successfully',
     data: {
-      slug: portfolio.unique_slug_string || portfolio.uniqueSlugString
+      slug: portfolio.unique_slug_string || portfolio.uniqueSlugString,
+      experiences: blocksWithStories
     }
   });
 }));

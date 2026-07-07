@@ -159,6 +159,13 @@ function SectionC({ t, personal, experiences, onChange }: Props) {
   };
 
   const openRecommendationModal = (experience: ExperienceBlock) => {
+    if (isNaN(Number(experience.id))) {
+      alert((personal as any).lang === 'ar' 
+        ? 'يرجى حفظ التغييرات (حفظ كمسودة) أولاً لتسجيل هذه الخبرة في قاعدة البيانات قبل طلب التوصية!' 
+        : 'Please save your draft first to register this work experience in the database before requesting a recommendation!'
+      );
+      return;
+    }
     setSelectedExp(experience);
     setEndorserCompany(experience.company || '');
     setEndorserTitle('');

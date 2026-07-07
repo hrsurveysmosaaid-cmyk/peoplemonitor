@@ -162,6 +162,12 @@ export default function DashboardPage() {
         if (data.data?.slug) {
           setPortfolioSlug(data.data.slug);
         }
+        if (data.data?.experiences) {
+          setWorkstationData((prev: WorkstationData) => ({
+            ...prev,
+            experiences: data.data.experiences
+          }));
+        }
       } else {
         setSaveStatus('Error saving draft');
       }
@@ -171,7 +177,7 @@ export default function DashboardPage() {
     }
   };
 
-    const submitPublish = async (settings: PublishSettings) => {
+  const submitPublish = async (settings: PublishSettings) => {
     setSaveStatus('Publishing...');
     try {
       const token = localStorage.getItem('token');
@@ -200,6 +206,12 @@ export default function DashboardPage() {
           const url = `${origin}/p/${slug}`;
           setPublishSuccessUrl(url);
           setShowPublishSuccess(true);
+        }
+        if (data.data?.experiences) {
+          setWorkstationData((prev: WorkstationData) => ({
+            ...prev,
+            experiences: data.data.experiences
+          }));
         }
       } else {
         setSaveStatus('Error publishing');
