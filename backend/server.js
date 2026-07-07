@@ -199,82 +199,331 @@ const renderSuperAdminLoginPage = (errorMsg) => `<!DOCTYPE html>
 </html>`;
 
 const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" id="adminHtml" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Super Admin Gateway Portal</title>
-  <style>body{font-family:Arial,Helvetica,sans-serif;background:#030712;color:#f8fafc;margin:0;padding:0}header{background:#0f172a;padding:24px;text-align:center;border-bottom:1px solid #334155}main{padding:24px}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{border:1px solid #334155;padding:12px;text-align:left;font-size:13px}th{background:#0f172a;color:#e2e8f0}tr:nth-child(even){background:#020617}button{padding:8px 12px;border:none;border-radius:8px;background:#0284c7;color:#fff;cursor:pointer}button:hover{background:#0369a1}pre{background:#020617;padding:12px;border-radius:12px;overflow:auto}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #030712;
+      --card-bg: rgba(15, 23, 42, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --success: #10b981;
+      --input-bg: rgba(255, 255, 255, 0.03);
+      --header-bg: #0f172a;
+    }
+    
+    .light {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text-color: #0f172a;
+      --text-muted: #64748b;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --success: #10b981;
+      --input-bg: rgba(0, 0, 0, 0.02);
+      --header-bg: #f1f5f9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+    body {
+      font-family: 'Inter', 'Outfit', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-section { display: flex; align-items: center; gap: 12px; }
+    .brand-icon { font-size: 24px; padding: 8px; background: var(--primary); border-radius: 12px; color: #fff; }
+    .brand-title h1 { font-size: 20px; font-weight: 700; }
+    .brand-title p { font-size: 12px; color: var(--text-muted); }
+
+    .control-actions { display: flex; gap: 12px; align-items: center; }
+
+    main { padding: 40px; flex-grow: 1; max-width: 1400px; width: 100%; margin: 0 auto; }
+    
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 30px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .table-container { overflow-x: auto; margin-top: 24px; border-radius: 12px; border: 1px solid var(--card-border); }
+    
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    [dir="rtl"] table { text-align: right; }
+    
+    th, td { padding: 16px 20px; font-size: 14px; border-bottom: 1px solid var(--card-border); }
+    th { background: var(--header-bg); font-weight: 600; color: var(--text-color); text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; }
+    
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: var(--input-bg); }
+
+    .badge-verified { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--success); padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+    .badge-unverified { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--danger); padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+
+    button, select {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: inherit;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-secondary { background: var(--card-border); color: var(--text-color); }
+
+    .status-msg { margin-top: 16px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+  </style>
 </head>
 <body>
   <header>
-    <h1>بوابة المشرف العليا المعزولة</h1>
-    <p>يمكنك الوصول مباشرة إلى لوحات المستخدمين وإجراء اختراق برمي آمن.</p>
+    <div class="brand-section">
+      <div class="brand-icon">🛡</div>
+      <div class="brand-title">
+        <h1 data-key="title">بوابة المشرف العليا</h1>
+        <p data-key="subtitle">لوحة التحكم الفائقة للأنظمة المعزولة</p>
+      </div>
+    </div>
+    <div class="control-actions">
+      <select id="langSelect">
+        <option value="ar">العربية (AR)</option>
+        <option value="en">English (EN)</option>
+      </select>
+      <button id="themeToggle" class="btn-secondary">🌓</button>
+      <button id="refreshBtn" class="btn-primary">🔄 <span data-key="refreshBtn">تحديث البيانات</span></button>
+    </div>
   </header>
+  
   <main>
-    <section>
-      <button id="refreshBtn">تحديث بيانات المستخدمين</button>
-      <div id="status" style="margin-top:12px;color:#94a3b8"></div>
-      <div id="users"></div>
-    </section>
+    <div class="panel-card">
+      <div class="status-msg" id="status"></div>
+      <div class="table-container" id="usersTable"></div>
+    </div>
   </main>
+
   <script>
+    const translations = {
+      ar: {
+        title: "بوابة المشرف العليا",
+        subtitle: "لوحة التحكم الفائقة للأنظمة المعزولة",
+        refreshBtn: "تحديث البيانات",
+        loading: "جارٍ تحميل قائمة المستخدمين...",
+        loaded: "تم تحميل المستخدمين بنجاح",
+        failLoad: "فشل تحميل قائمة المستخدمين",
+        bridgeActive: "تم فتح جسر الوصول بنجاح",
+        deleteConfirm: "هل أنت متأكد من حذف هذا المستخدم وجميع البيانات المرتبطة به؟ لا يمكن التراجع عن هذا الإجراء.",
+        deleteSuccess: "تم حذف المستخدم بنجاح",
+        deleteFail: "فشل حذف المستخدم",
+        verified: "نعم",
+        unverified: "لا",
+        id: "ID",
+        name: "الاسم الكامل",
+        email: "البريد الإلكتروني",
+        status: "موثق",
+        portfolios: "الحقائب (رابط مباشر)",
+        actions: "الإجراءات",
+        bridgeBtn: "جسر الوصول العميق",
+        deleteBtn: "حذف"
+      },
+      en: {
+        title: "Super Admin Gateway",
+        subtitle: "Enterprise Super Admin Panel Control Hub",
+        refreshBtn: "Refresh Data",
+        loading: "Loading user directory...",
+        loaded: "Users directory loaded successfully",
+        failLoad: "Failed to load user directory",
+        bridgeActive: "Access bridge created successfully",
+        deleteConfirm: "Are you sure you want to delete this user and all associated data? This action cannot be undone.",
+        deleteSuccess: "User deleted successfully",
+        deleteFail: "Failed to delete user",
+        verified: "Yes",
+        unverified: "No",
+        id: "ID",
+        name: "Full Name",
+        email: "Email Address",
+        status: "Verified",
+        portfolios: "Portfolios (Direct URL)",
+        actions: "Actions",
+        bridgeBtn: "Deep Access Bridge",
+        deleteBtn: "Delete"
+      }
+    };
+
+    let currentLang = localStorage.getItem('adminLang') || 'ar';
+    document.getElementById('langSelect').value = currentLang;
+    document.getElementById('adminHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+
+    const setLanguage = (lang) => {
+      currentLang = lang;
+      localStorage.setItem('adminLang', lang);
+      document.getElementById('adminHtml').dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.querySelectorAll('[data-key]').forEach(el => {
+        const key = el.getAttribute('data-key');
+        if (translations[lang][key]) {
+          if (el.tagName === 'SPAN') {
+            el.textContent = translations[lang][key];
+          } else {
+            el.textContent = translations[lang][key];
+          }
+        }
+      });
+      loadUsers();
+    };
+
+    document.getElementById('langSelect').addEventListener('change', (e) => setLanguage(e.target.value));
+
+    // Theme toggler
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      const html = document.getElementById('adminHtml');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+      }
+    });
+
     const statusEl = document.getElementById('status');
-    const usersEl = document.getElementById('users');
+    const usersTableEl = document.getElementById('usersTable');
     const refreshBtn = document.getElementById('refreshBtn');
+
+    const deleteUser = async (userId) => {
+      if (!confirm(translations[currentLang].deleteConfirm)) return;
+      
+      statusEl.textContent = "...";
+      try {
+        const res = await fetch('/api/admin/users/' + userId, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          statusEl.textContent = translations[currentLang].deleteSuccess;
+          loadUsers();
+        } else {
+          statusEl.textContent = (data.error || translations[currentLang].deleteFail);
+        }
+      } catch (err) {
+        statusEl.textContent = translations[currentLang].deleteFail;
+      }
+    };
 
     const renderUsers = (users) => {
       if (!users.length) {
-        usersEl.innerHTML = '<p>لا يوجد مستخدمون حتى الآن.</p>';
+        usersTableEl.innerHTML = '<p style="padding: 24px; text-align: center;">No users found.</p>';
         return;
       }
 
+      const t = translations[currentLang];
       const rows = users.map(function(user) {
-        var portfolioHtml = user.portfolios.map(function(p) {
+        const portfolioHtml = user.portfolios.map(function(p) {
           const url = 'https://peopleos.online/' + p.slug;
-          return '<div>' + (p.slug ? '<a href="' + url + '" target="_blank" style="color: #38bdf8; text-decoration: underline;">' + p.slug + '</a>' : '-') + (p.isPublishedLive ? ' ✅' : '') + '</div>';
+          return '<div>' + (p.slug ? '<a href="' + url + '" target="_blank" style="color: #4f46e5; text-decoration: underline; font-weight: 500;">' + p.slug + '</a>' : '-') + (p.isPublishedLive ? ' ✅' : '') + '</div>';
         }).join('');
+        
+        const badgeClass = user.isVerified ? 'badge-verified' : 'badge-unverified';
+        const badgeText = user.isVerified ? t.verified : t.unverified;
+
         return '<tr>' +
           '<td>' + user.id + '</td>' +
-          '<td>' + user.fullName + '</td>' +
+          '<td><strong>' + user.fullName + '</strong></td>' +
           '<td>' + user.email + '</td>' +
-          '<td>' + (user.isVerified ? 'نعم' : 'لا') + '</td>' +
+          '<td><span class="' + badgeClass + '">' + badgeText + '</span></td>' +
           '<td>' + portfolioHtml + '</td>' +
-          '<td><button data-user-id="' + user.id + '">جسر الوصول العميق</button></td>' +
+          '<td style="display: flex; gap: 8px;">' +
+            '<button class="btn-primary" data-bridge-id="' + user.id + '">🔑 ' + t.bridgeBtn + '</button>' +
+            '<button class="btn-danger" data-delete-id="' + user.id + '">🗑 ' + t.deleteBtn + '</button>' +
+          '</td>' +
         '</tr>';
       }).join('');
 
-      usersEl.innerHTML = '<table>' +
-        '<thead><tr><th>ID</th><th>الاسم</th><th>البريد</th><th>موثق</th><th>الحقائب (رابط مباشر)</th><th>جسر</th></tr></thead>' +
+      usersTableEl.innerHTML = '<table>' +
+        '<thead><tr>' +
+          '<th>' + t.id + '</th>' +
+          '<th>' + t.name + '</th>' +
+          '<th>' + t.email + '</th>' +
+          '<th>' + t.status + '</th>' +
+          '<th>' + t.portfolios + '</th>' +
+          '<th>' + t.actions + '</th>' +
+        '</tr></thead>' +
         '<tbody>' + rows + '</tbody>' +
       '</table>';
 
-      document.querySelectorAll('[data-user-id]').forEach((button) => {
+      // Event Listeners for Bridge
+      document.querySelectorAll('[data-bridge-id]').forEach((button) => {
         button.addEventListener('click', async () => {
-          const userId = button.getAttribute('data-user-id');
-          statusEl.textContent = 'جارٍ إنشاء رابط الجسر...';
+          const userId = button.getAttribute('data-bridge-id');
+          statusEl.textContent = '...';
           const response = await fetch('/api/admin/users/' + userId + '/deep-portal', { method: 'POST' });
           const payload = await response.json();
           if (!payload.success) {
-            statusEl.textContent = payload.error || 'فشل إنشاء الجسر';
+            statusEl.textContent = payload.error || 'Bridge error';
             return;
           }
           window.open(payload.data.bridgeUrl, '_blank');
-          statusEl.textContent = 'تم فتح جسر الوصول في نافذة جديدة';
+          statusEl.textContent = t.bridgeActive;
+        });
+      });
+
+      // Event Listeners for Delete
+      document.querySelectorAll('[data-delete-id]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const userId = button.getAttribute('data-delete-id');
+          deleteUser(userId);
         });
       });
     };
 
     const loadUsers = async () => {
-      statusEl.textContent = 'جارٍ تحميل قائمة المستخدمين...';
-      const response = await fetch('/api/admin/users');
-      const payload = await response.json();
-      if (!payload.success) {
-        statusEl.textContent = payload.error || 'فشل تحميل المستخدمين';
-        return;
+      statusEl.textContent = translations[currentLang].loading;
+      try {
+        const response = await fetch('/api/admin/users');
+        const payload = await response.json();
+        if (!payload.success) {
+          statusEl.textContent = payload.error || translations[currentLang].failLoad;
+          return;
+        }
+        renderUsers(payload.data);
+        statusEl.textContent = translations[currentLang].loaded;
+      } catch (err) {
+        statusEl.textContent = translations[currentLang].failLoad;
       }
-      renderUsers(payload.data);
-      statusEl.textContent = 'تم تحميل المستخدمين بنجاح';
     };
 
     refreshBtn.addEventListener('click', loadUsers);

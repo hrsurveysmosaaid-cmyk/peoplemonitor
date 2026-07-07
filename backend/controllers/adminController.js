@@ -62,7 +62,40 @@ const createDeepPortalBridge = async (req, res, next) => {
   }
 };
 
+const deleteUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'User ID is required' });
+    }
+
+    const user = await GlobalUsersModel.getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    // Cascade deletions of related records to avoid SQL constraint violations
+    await executeQuery('DELETE FROM external_live_endorsements WHERE requestor_id = ?', [userId]);
+    await executeQuery('DELETE FROM micro_success_stories WHERE user_id = ?', [userId]);
+    
+    // Get portfolios to clean experience blocks
+    const portfolios = await executeQuery('SELECT id FROM core_portfolios WHERE user_id = ?', [userId]);
+    for (const p of portfolios) {
+      await executeQuery('DELETE FROM portfolio_experience_blocks WHERE portfolio_id = ?', [p.id]);
+    }
+    await executeQuery('DELETE FROM core_portfolios WHERE user_id = ?', [userId]);
+    
+    // Finally delete user
+    await GlobalUsersModel.deleteUser(userId);
+
+    return res.json({ success: true, message: 'User and all associated data deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   listUsers,
   createDeepPortalBridge,
+  deleteUser,
 };

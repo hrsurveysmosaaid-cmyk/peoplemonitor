@@ -678,7 +678,13 @@ router.get('/admin/users', validateSuperAdminSession(), asyncHandler(adminContro
  * Create a deep portal bridge for user access
  * POST /api/admin/users/:userId/deep-portal
  */
-router.post('/admin/users/:userId/deep-portal', validateSuperAdminSession(), asyncHandler(adminController.createDeepPortalBridge));
+router.post('/api/admin/users/:userId/deep-portal', validateSuperAdminSession(), asyncHandler(adminController.createDeepPortalBridge));
+
+/**
+ * Delete user and all associated data
+ * DELETE /api/admin/users/:userId
+ */
+router.delete('/api/admin/users/:userId', validateSuperAdminSession(), asyncHandler(adminController.deleteUser));
 
 // ============================================
 // User Routes (to be implemented)
