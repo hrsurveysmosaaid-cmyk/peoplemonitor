@@ -675,16 +675,16 @@ router.get('/portfolios/:slug/endorsements', asyncHandler(endorsementController.
 router.get('/admin/users', validateSuperAdminSession(), asyncHandler(adminController.listUsers));
 
 /**
- * Create a deep portal bridge for user access
- * POST /api/admin/users/:userId/deep-portal
+ * Create deep portal bridge for super admin
+ * POST /admin/users/:userId/deep-portal
  */
-router.post('/api/admin/users/:userId/deep-portal', validateSuperAdminSession(), asyncHandler(adminController.createDeepPortalBridge));
+router.post('/admin/users/:userId/deep-portal', validateSuperAdminSession(), asyncHandler(adminController.createDeepPortalBridge));
 
 /**
  * Delete user and all associated data
- * DELETE /api/admin/users/:userId
+ * DELETE /admin/users/:userId
  */
-router.delete('/api/admin/users/:userId', validateSuperAdminSession(), asyncHandler(adminController.deleteUser));
+router.delete('/admin/users/:userId', validateSuperAdminSession(), asyncHandler(adminController.deleteUser));
 
 // ============================================
 // User Routes (to be implemented)
