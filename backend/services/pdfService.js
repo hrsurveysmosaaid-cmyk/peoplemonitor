@@ -391,6 +391,8 @@ const generateAtsPdf = async (payload) => {
           if (doc.y > maxColY) maxColY = doc.y;
         });
 
+        // CRITICAL: reset X to left margin after multi-column layout
+        doc.x = doc.page.margins.left;
         doc.y = maxColY;
         doc.moveDown(1.2);
       }
