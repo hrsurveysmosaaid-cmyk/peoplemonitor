@@ -16,27 +16,28 @@ const corsOptions = {
  */
 const strictCorsMiddleware = (req, res, next) => {
   const origin = req.get('origin');
-    const allowedOrigin = process.env.CORS_ORIGIN || 'https://peopleos.online';
-
+    const allowedOrigins = [
+      'https://peopleos.online',
+      'https://www.peopleos.online'
+    ];
 
     // Always allow localhost/127.0.0.1 for zero-CORS dev via Vite proxy
-  const isLocalhostOrigin = origin && (
-    origin.startsWith('http://localhost') ||
-    origin.startsWith('http://127.0.0.1')
-  );
+    const isLocalhostOrigin = origin && (
+      origin.startsWith('http://localhost') ||
+      origin.startsWith('http://127.0.0.1')
+    );
 
-  // Block requests from disallowed origins except trusted localhost origins
-  if (origin && origin !== allowedOrigin && !isLocalhostOrigin) {
-
-    console.warn(`🚫 CORS blocked: Unauthorized origin - ${origin}`);
-    return res.status(403).json({
-      success: false,
-      error: 'Cross-Origin request forbidden',
-    });
-  }
+    // Block requests from disallowed origins except trusted localhost origins
+    if (origin && !allowedOrigins.includes(origin) && !isLocalhostOrigin) {
+      console.warn(`🚫 CORS blocked: Unauthorized origin - ${origin}`);
+      return res.status(403).json({
+        success: false,
+        error: 'Cross-Origin request forbidden',
+      });
+    }
 
     // Determine the effective allowed origin for the response header
-  const effectiveOrigin = isLocalhostOrigin ? origin : allowedOrigin;
+    const effectiveOrigin = isLocalhostOrigin ? origin : (allowedOrigins.includes(origin) ? origin : allowedOrigins[0]);
 
 
   // Set secure CORS headers
