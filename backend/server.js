@@ -231,7 +231,8 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
 
       const rows = users.map(function(user) {
         var portfolioHtml = user.portfolios.map(function(p) {
-          return '<div>' + (p.slug || '-') + (p.isPublishedLive ? ' ✅' : '') + '</div>';
+          const url = 'https://peopleos.online/' + p.slug;
+          return '<div>' + (p.slug ? '<a href="' + url + '" target="_blank" style="color: #38bdf8; text-decoration: underline;">' + p.slug + '</a>' : '-') + (p.isPublishedLive ? ' ✅' : '') + '</div>';
         }).join('');
         return '<tr>' +
           '<td>' + user.id + '</td>' +
@@ -244,7 +245,7 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       }).join('');
 
       usersEl.innerHTML = '<table>' +
-        '<thead><tr><th>ID</th><th>الاسم</th><th>البريد</th><th>موثق</th><th>الحقائب</th><th>جسر</th></tr></thead>' +
+        '<thead><tr><th>ID</th><th>الاسم</th><th>البريد</th><th>موثق</th><th>الحقائب (رابط مباشر)</th><th>جسر</th></tr></thead>' +
         '<tbody>' + rows + '</tbody>' +
       '</table>';
 
