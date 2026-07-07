@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { PersonalDetails } from '../../types';
+import { PersonalDetails, LanguageEntry } from '../../types';
 import type { TranslationType } from '../../translations';
+import { nanoid } from 'nanoid';
+import { Plus, Trash2 } from 'lucide-react';
 
 
 type Props = {
@@ -302,6 +304,69 @@ function SectionA({ t, personal, onChange }: Props) {
           />
 
         </label>
+
+        {/* Languages */}
+        <div className="block lg:col-span-3">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <span className="text-slate-300">{(t as any).languagesLabel || 'Languages'}</span>
+              <p className="text-xs text-slate-500 mt-0.5">{(t as any).languagesDesc || 'Add languages you speak and your proficiency level.'}</p>
+            </div>
+            <button
+              type="button"
+              className="button-secondary text-xs px-3 py-2"
+              onClick={() => {
+                const langs: LanguageEntry[] = personal.languages || [];
+                onChange({ ...personal, languages: [...langs, { language: '', proficiency: '' }] });
+              }}
+            >
+              <Plus size={14} />
+              <span className="ml-1">{(t as any).addLanguage || 'Add Language'}</span>
+            </button>
+          </div>
+
+          {(!personal.languages || personal.languages.length === 0) && (
+            <p className="text-sm text-slate-500">{(t as any).noLanguages || 'No languages added yet.'}</p>
+          )}
+
+          <div className="space-y-3">
+            {(personal.languages || []).map((langEntry, idx) => (
+              <div key={idx} className="flex items-center gap-3">
+                <input
+                  className="input-field flex-1"
+                  value={langEntry.language}
+                  onChange={(e) => {
+                    const updated = [...(personal.languages || [])];
+                    updated[idx] = { ...updated[idx], language: e.target.value };
+                    onChange({ ...personal, languages: updated });
+                  }}
+                  placeholder={(t as any).languageNamePlaceholder || 'e.g., English, Arabic'}
+                />
+                <input
+                  className="input-field flex-1"
+                  value={langEntry.proficiency}
+                  onChange={(e) => {
+                    const updated = [...(personal.languages || [])];
+                    updated[idx] = { ...updated[idx], proficiency: e.target.value };
+                    onChange({ ...personal, languages: updated });
+                  }}
+                  placeholder={(t as any).languageProficiencyPlaceholder || 'e.g., Native, Fluent'}
+                />
+                <button
+                  type="button"
+                  className="button-secondary p-2"
+                  onClick={() => {
+                    const updated = (personal.languages || []).filter((_, i) => i !== idx);
+                    onChange({ ...personal, languages: updated });
+                  }}
+                  aria-label="Remove language"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
 
       </div>
     </section>

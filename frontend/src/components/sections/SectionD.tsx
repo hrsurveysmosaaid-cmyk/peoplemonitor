@@ -99,12 +99,10 @@ function SectionD({ t, education, onChange }: Props) {
         id={id}
         className="input-field mt-2"
         type="text"
-        inputMode="numeric"
-        pattern="\d{4}-(0[1-9]|1[0-2])"
-        placeholder="YYYY-MM"
-        value={(value || '').slice(0,7)}
+        placeholder="YYYY-MM, Now, Present..."
+        value={value || ''}
         onChange={(e) => onValue(e.target.value)}
-        title="Use format YYYY-MM, e.g., 2023-09"
+        title="Use format YYYY-MM, or words like Now, Current, etc."
       />
     );
   };

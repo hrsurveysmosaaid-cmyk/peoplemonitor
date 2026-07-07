@@ -214,12 +214,10 @@ function SectionC({ t, personal, experiences, onChange }: Props) {
         id={id}
         className="input-field mt-2"
         type="text"
-        inputMode="numeric"
-        pattern="\d{4}-(0[1-9]|1[0-2])"
-        placeholder="YYYY-MM"
-        value={(value || '').slice(0,7)}
+        placeholder="YYYY-MM, Now, Present..."
+        value={value || ''}
         onChange={(e) => onValue(e.target.value)}
-        title="Use format YYYY-MM, e.g., 2023-09"
+        title="Use format YYYY-MM, or words like Now, Current, etc."
       />
     );
   };
@@ -389,8 +387,8 @@ function SectionC({ t, personal, experiences, onChange }: Props) {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
-                    <div className="glass-inner-card relative max-w-lg w-full p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4">
+          <div className="glass-inner-card relative max-w-lg w-full p-6">
 
                         <h3 className="text-xl font-bold text-white mb-4">{t.requestModalTitle}</h3>
             <p className="text-sm text-slate-300 mb-6">

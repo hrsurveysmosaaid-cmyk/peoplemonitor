@@ -187,6 +187,16 @@ export const en = {
   descLabel: "Description",
   link: "Related Link",
   
+  // Languages
+  languagesLabel: "Languages",
+  languagesDesc: "Add languages you speak and your proficiency level.",
+  addLanguage: "Add Language",
+  languageName: "Language",
+  languageProficiency: "Proficiency",
+  languageNamePlaceholder: "e.g., English, Arabic",
+  languageProficiencyPlaceholder: "e.g., Native, Fluent, Intermediate",
+  noLanguages: "No languages added yet.",
+
   endorsementsTitle: "Signed Professional Endorsements",
   noEndorsements: "No verified endorsements yet. Send a request to your manager or colleague.",
   freeGuideCta: "Download your free copy of the CV Dilemma Guide - Job Market Secrets"
@@ -379,6 +389,16 @@ export const ar = {
   descLabel: "الوصف",
   link: "رابط مرتبط",
   
+  // Languages
+  languagesLabel: "اللغات",
+  languagesDesc: "أضف اللغات التي تتحدثها ومستوى إتقانك لكل منها.",
+  addLanguage: "إضافة لغة",
+  languageName: "اللغة",
+  languageProficiency: "مستوى الإتقان",
+  languageNamePlaceholder: "مثال: العربية، الإنجليزية",
+  languageProficiencyPlaceholder: "مثال: اللغة الأم، طليق، متوسط",
+  noLanguages: "لم تتم إضافة أي لغات بعد.",
+
   endorsementsTitle: "توصيات مهنية مصدقة وموقعة",
   noEndorsements: "لا توجد توصيات مصدقة بعد. أرسل طلباً لمديرك أو زميلك.",
   freeGuideCta: "حمل نسختك المجانية من دليل معضلة السير الذاتية - أسرار سوق العمل"

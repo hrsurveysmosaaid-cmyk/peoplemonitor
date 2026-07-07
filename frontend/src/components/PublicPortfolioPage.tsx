@@ -293,7 +293,7 @@ export default function PublicPortfolioPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <h3 className="text-lg font-bold text-white">{block.role_designation}</h3>
                     <span className="text-xs text-sky-400 font-semibold bg-sky-500/10 px-3 py-1 rounded-full inline-flex items-center gap-2">
-                      <Briefcase size={14} /> {block.institution_title} ({block.date_start ? block.date_start.slice(0, 7) : ''} - {block.date_end ? block.date_end.slice(0, 7) : t.now})
+                      <Briefcase size={14} /> {block.institution_title}{block.location ? ` (${block.location})` : ''} ({block.date_start || ''} - {block.date_end || t.now})
                     </span>
                   </div>
                   <p className="text-slate-300 text-sm leading-relaxed">{block.description_narrative}</p>

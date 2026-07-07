@@ -1,3 +1,8 @@
+export type LanguageEntry = {
+  language: string;
+  proficiency: string;
+};
+
 export type PersonalDetails = {
   prefix?: 'Mr.' | 'Ms.' | 'Miss' | 'Mis.' | '';
   fullName: string;
@@ -5,16 +10,17 @@ export type PersonalDetails = {
   email: string;
   phone: string;
   location: string;
-  residencyStatus?: string; // optional residency/permit status
-  nationality?: string; // optional nationality
-  birthYear?: string; // YYYY only
-  birthMonth?: string; // MM only
+  residencyStatus?: string;
+  nationality?: string;
+  birthYear?: string;
+  birthMonth?: string;
   profileImageUrl: string;
   website: string;
   linkedin: string;
-    github: string;
-  behance: string; // Behance profile link
-  availability?: '' | 'open' | 'freelance' | 'consulting'; // availability status
+  github: string;
+  behance: string;
+  availability?: '' | 'open' | 'freelance' | 'consulting';
+  languages?: LanguageEntry[];
 };
 
 

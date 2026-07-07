@@ -102,8 +102,8 @@ export default function DashboardPage() {
             id: String(block.id),
             title: block.role_designation || '',
             company: block.institution_title || '',
-            startDate: block.date_start ? block.date_start.slice(0, 7) : '',
-            endDate: block.date_end ? block.date_end.slice(0, 7) : '',
+            startDate: block.date_start || '',
+            endDate: block.date_end || '',
             description: block.description_narrative || '',
             attachedAssetUrl: block.attached_asset_url || '',
             successStory: block.successStory || ''
@@ -227,12 +227,14 @@ export default function DashboardPage() {
         personal: {
           ...workstationData.personal,
           profileImageUrl: undefined, // exclude images
-          website: profileUrl || workstationData.personal.website || ''
+          website: profileUrl || workstationData.personal.website || '',
+          languages: workstationData.personal.languages || []
         },
         summary: workstationData.summary || '',
         experiences: workstationData.experiences.map((e) => ({
           title: e.title,
           company: e.company,
+          location: e.location,
           startDate: e.startDate,
           endDate: e.endDate,
           description: e.description

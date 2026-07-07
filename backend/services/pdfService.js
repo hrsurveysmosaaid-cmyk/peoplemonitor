@@ -209,6 +209,16 @@ const generateAtsPdf = async (payload) => {
       doc.moveTo(doc.page.margins.left, doc.y).lineTo(doc.page.width - doc.page.margins.right, doc.y).stroke();
       addVerticalSpacing(doc, 1);
 
+      // Languages row (right after header divider)
+      const languages = Array.isArray(data.personal?.languages) ? data.personal.languages : [];
+      if (languages.length > 0) {
+        const langText = languages.map(l => l.language + (l.proficiency ? ` (${l.proficiency})` : '')).join('  |  ');
+        const label = isArabic ? 'اللغات: ' : 'Languages: ';
+        doc.font(fonts.bold).fontSize(9.5).text(label, { continued: true, align: isArabic ? 'right' : 'left', width: textWidth(doc) });
+        doc.font(fonts.regular).fontSize(9.5).text(langText, { align: isArabic ? 'right' : 'left', width: textWidth(doc) });
+        addVerticalSpacing(doc, 0.5);
+      }
+
       // Summary
       if (data.summary || data.professionalSummary) {
         addHeading(doc, isArabic ? 'الخلاصة المهنية' : 'Professional Summary', fonts, isArabic);

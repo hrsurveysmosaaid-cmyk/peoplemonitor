@@ -58,6 +58,15 @@ const createPortfolio = async (portfolioData) => {
   }
 };
 
+const safeParseJson = (val) => {
+  if (typeof val === 'object' && val !== null) return val;
+  try {
+    return JSON.parse(val);
+  } catch (e) {
+    return val;
+  }
+};
+
 /**
  * Get portfolio by ID
  */
@@ -67,8 +76,8 @@ const getPortfolioById = async (id) => {
   try {
     const results = await executeQuery(query, [id]);
     if (results.length > 0) {
-      results[0].personal_data_json = JSON.parse(results[0].personal_data_json);
-      results[0].skills_classified_json = JSON.parse(results[0].skills_classified_json);
+      results[0].personal_data_json = safeParseJson(results[0].personal_data_json);
+      results[0].skills_classified_json = safeParseJson(results[0].skills_classified_json);
     }
     return results.length > 0 ? results[0] : null;
   } catch (error) {
@@ -85,8 +94,8 @@ const getPortfolioBySlug = async (slug) => {
   try {
     const results = await executeQuery(query, [slug]);
     if (results.length > 0) {
-      results[0].personal_data_json = JSON.parse(results[0].personal_data_json);
-      results[0].skills_classified_json = JSON.parse(results[0].skills_classified_json);
+      results[0].personal_data_json = safeParseJson(results[0].personal_data_json);
+      results[0].skills_classified_json = safeParseJson(results[0].skills_classified_json);
     }
     return results.length > 0 ? results[0] : null;
   } catch (error) {
@@ -104,8 +113,8 @@ const getPortfoliosByUserId = async (userId) => {
     const results = await executeQuery(query, [userId]);
     return results.map(portfolio => ({
       ...portfolio,
-      personal_data_json: JSON.parse(portfolio.personal_data_json),
-      skills_classified_json: JSON.parse(portfolio.skills_classified_json)
+      personal_data_json: safeParseJson(portfolio.personal_data_json),
+      skills_classified_json: safeParseJson(portfolio.skills_classified_json)
     }));
   } catch (error) {
     throw new Error(`Failed to fetch portfolios: ${error.message}`);

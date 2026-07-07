@@ -12,8 +12,8 @@ const createPortfolioExperienceBlocksTable = async () => {
       block_type ENUM('work', 'education', 'project', 'award', 'volunteer') NOT NULL,
       institution_title VARCHAR(255) NOT NULL,
       role_designation VARCHAR(255) NULL,
-      date_start DATE NULL,
-      date_end DATE NULL,
+      date_start VARCHAR(255) NULL,
+      date_end VARCHAR(255) NULL,
       description_narrative TEXT NULL,
       attached_asset_url VARCHAR(255) NULL,
       external_navigation_url VARCHAR(255) NULL,
@@ -25,6 +25,13 @@ const createPortfolioExperienceBlocksTable = async () => {
   
   try {
     await executeQuery(query);
+    // Alter existing table columns to VARCHAR to allow text formats like "Now"
+    try {
+      await executeQuery(`ALTER TABLE portfolio_experience_blocks MODIFY date_start VARCHAR(255) NULL`);
+      await executeQuery(`ALTER TABLE portfolio_experience_blocks MODIFY date_end VARCHAR(255) NULL`);
+    } catch (alterErr) {
+      console.log('Note: Columns date_start/date_end may already be VARCHAR(255)');
+    }
     console.log('✅ Table portfolio_experience_blocks created successfully');
   } catch (error) {
     console.error('❌ Error creating portfolio_experience_blocks table:', error.message);

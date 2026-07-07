@@ -341,6 +341,19 @@ export default function PublicPortfolioPageV2() {
             </div>
           )}
 
+          {/* Languages */}
+          {((personal as any).languages && (personal as any).languages.length > 0) && (
+            <div className="pt-3 border-t border-white/10">
+              <p className="text-xs font-semibold opacity-70 mb-2">{lang === 'ar' ? 'اللغات' : 'Languages'}</p>
+              <div className="flex flex-wrap gap-2">
+                {((personal as any).languages as Array<{language: string; proficiency: string}>).map((l, i) => (
+                  <span key={i} className="text-xs px-3 py-1 rounded-full border border-white/15 bg-white/8">
+                    {l.language}{l.proficiency ? ` — ${l.proficiency}` : ''}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
 
@@ -449,7 +462,8 @@ export default function PublicPortfolioPageV2() {
                 const fmt = (v: any) => {
                   if (!v) return '';
                   const s = String(v);
-                  return s.length >= 7 ? s.slice(0,7) : s;
+                  if (/^\d{4}-\d{2}/.test(s)) return s.slice(0,7);
+                  return s;
                 };
                 const s = fmt(item.startDate);
                 const e = fmt(item.endDate);

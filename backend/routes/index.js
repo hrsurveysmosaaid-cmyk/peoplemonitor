@@ -531,7 +531,7 @@ router.post('/endorsements/send-request', authenticate(), asyncHandler(async (re
   const mailConfig = require('../config/mail');
   
   const mailOptions = {
-    from: `"${process.env.SMTP_FROM_NAME || 'PeopleOS'}" <${process.env.SMTP_FROM_EMAIL}>`,
+    from: `"${process.env.SMTP_FROM_NAME || 'PeopleOS'}" <${process.env.SMTP_USER}>`,
     to: endorserEmail,
     subject: `Recommendation Request from ${user.full_name}`,
     html: `
