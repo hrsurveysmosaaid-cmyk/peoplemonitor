@@ -57,7 +57,7 @@ const sendOTPEmail = async (email, otp, fullName = 'User') => {
   }
 
   const mailOptions = {
-    from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_FROM_EMAIL}>`,
+    from: `${process.env.SMTP_FROM_NAME || 'PeopleOS'} <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'تحقق من بريدك الإلكتروني - Verify Your Email',
     html: `
@@ -204,7 +204,7 @@ const sendPasswordResetEmail = async (email, resetToken, fullName = 'User') => {
 
 
   const mailOptions = {
-    from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_FROM_EMAIL}>`,
+    from: `${process.env.SMTP_FROM_NAME || 'PeopleOS'} <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'إعادة تعيين كلمة المرور - Reset Your Password',
     html: `
@@ -344,7 +344,7 @@ const sendWelcomeEmail = async (email, fullName = 'User') => {
   }
 
   const mailOptions = {
-    from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_FROM_EMAIL}>`,
+    from: `${process.env.SMTP_FROM_NAME || 'PeopleOS'} <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'مرحباً بك في PeopleOS - Welcome to PeopleOS',
     html: `
