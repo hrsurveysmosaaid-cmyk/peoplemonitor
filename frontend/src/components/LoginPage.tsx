@@ -324,48 +324,50 @@ export default function LoginPage() {
                 </form>
               </>
             ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-5">
-                <p className="text-sm text-slate-300 text-center">{t.enterOtp || 'Enter the 6-digit code sent to your email'}</p>
-                <label className="block">
-                  <span className="text-slate-300 text-sm font-medium">{t.otpCode || 'OTP Code'}</span>
-                  <input
-                    id="input-otp"
-                    type="text"
-                    required
-                    maxLength={6}
-                    className="input-field mt-2 text-center text-xl font-bold tracking-[0.5em]"
-                    placeholder="000000"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+              <>
+                <form onSubmit={handleVerifyOtp} className="space-y-5">
+                  <p className="text-sm text-slate-300 text-center">{t.enterOtp || 'Enter the 6-digit code sent to your email'}</p>
+                  <label className="block">
+                    <span className="text-slate-300 text-sm font-medium">{t.otpCode || 'OTP Code'}</span>
+                    <input
+                      id="input-otp"
+                      type="text"
+                      required
+                      maxLength={6}
+                      className="input-field mt-2 text-center text-xl font-bold tracking-[0.5em]"
+                      placeholder="000000"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                      disabled={loading}
+                    />
+                  </label>
+
+                  <button
+                    id="btn-verify-otp"
+                    type="submit"
                     disabled={loading}
-                  />
-                </label>
+                    className="button-primary w-full py-3 mt-4 text-base disabled:opacity-60"
+                  >
+                    {loading ? (t.verifying || 'Verifying…') : (t.verify || 'Verify')}
+                  </button>
+                </form>
+                
+                <div className="mt-4 text-center">
+                  <button 
+                    onClick={handleResendOtp} 
+                    disabled={resendDisabled || loading} 
+                    className="text-indigo-500 text-sm font-semibold hover:underline disabled:opacity-50"
+                  >
+                    {resendDisabled ? `إعادة الإرسال بعد ${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}` : 'إعادة إرسال رمز التحقق'}
+                  </button>
+                </div>
 
-                <button
-                  id="btn-verify-otp"
-                  type="submit"
-                  disabled={loading}
-                  className="button-primary w-full py-3 mt-4 text-base disabled:opacity-60"
-                >
-                  {loading ? (t.verifying || 'Verifying…') : (t.verify || 'Verify')}
-                </button>
-              </form>
-              
-              <div className="mt-4 text-center">
-                <button 
-                  onClick={handleResendOtp} 
-                  disabled={resendDisabled || loading} 
-                  className="text-indigo-500 text-sm font-semibold hover:underline disabled:opacity-50"
-                >
-                  {resendDisabled ? `إعادة الإرسال بعد ${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}` : 'إعادة إرسال رمز التحقق'}
-                </button>
-              </div>
-
-              <div className="mt-6 text-center">
-                <button onClick={() => setShowOtp(false)} className="text-sky-400 text-sm font-semibold hover:underline">
-                  ← {t.backToLogin || 'Back to login'}
-                </button>
-              </div>
+                <div className="mt-6 text-center">
+                  <button onClick={() => setShowOtp(false)} className="text-sky-400 text-sm font-semibold hover:underline">
+                    ← {t.backToLogin || 'Back to login'}
+                  </button>
+                </div>
+              </>
             )}
 
             <div className="mt-8 pt-6 border-t border-white/10 text-center">
