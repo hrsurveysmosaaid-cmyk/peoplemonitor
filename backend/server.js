@@ -452,9 +452,23 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
 
       const t = translations[currentLang];
       const rows = users.map(function(user) {
-        const portfolioHtml = user.portfolios.map(function(p) {
-          const url = '/p/' + p.slug;
-          return '<div>' + (p.slug ? '<a href="' + url + '" target="_blank" style="color: #4f46e5; text-decoration: underline; font-weight: 500;">' + p.slug + '</a>' : '-') + (p.isPublishedLive ? ' ✅' : '') + '</div>';
+        const portfolioHtml = user.portfolios.length === 0 ? '<span style="color:#64748b;font-size:12px;">No portfolio</span>' : user.portfolios.map(function(p) {
+          if (!p.slug) return '<span style="color:#64748b;font-size:12px;">—</span>';
+          if (p.isPublishedLive) {
+            // Published: show clickable public link
+            return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+              '<a href="/p/' + p.slug + '" target="_blank" style="color:#4f46e5;text-decoration:underline;font-weight:500;font-size:13px;">' + p.slug + '</a>' +
+              '<span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;">✅ Live</span>' +
+              '<a href="/super-admin/preview-portfolio/' + p.slug + '" target="_blank" style="background:rgba(99,102,241,0.15);color:#6366f1;border:1px solid rgba(99,102,241,0.3);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;text-decoration:none;">👁 Preview</a>' +
+            '</div>';
+          } else {
+            // Unpublished / Draft: no public link, but admin can preview
+            return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+              '<span style="color:#94a3b8;font-size:13px;">' + p.slug + '</span>' +
+              '<span style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;">⏸ Draft</span>' +
+              '<a href="/super-admin/preview-portfolio/' + p.slug + '" target="_blank" style="background:rgba(99,102,241,0.15);color:#6366f1;border:1px solid rgba(99,102,241,0.3);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;text-decoration:none;">👁 Preview</a>' +
+            '</div>';
+          }
         }).join('');
         
         const badgeClass = user.isVerified ? 'badge-verified' : 'badge-unverified';
@@ -764,6 +778,40 @@ app.get('/super-admin/user-workstation/:userId', validateSuperAdminSession(), as
   }
   const portfolios = await CorePortfoliosModel.getPortfoliosByUserId(user.id);
   res.send(renderUserWorkstationPage(user, portfolios));
+}));
+
+// Super-admin portfolio preview — bypasses is_published_live check
+app.get('/super-admin/preview-portfolio/:slug', validateSuperAdminSession(), asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+  const portfolio = await CorePortfoliosModel.getPortfolioBySlug(slug);
+  if (!portfolio) {
+    return res.status(404).send(`<h2 style="font-family:sans-serif;padding:40px;color:#ef4444;">Portfolio not found: ${slug}</h2>`);
+  }
+  // Temporarily mark as published so the public API serves it, then redirect
+  // Instead: serve raw data as JSON for admin inspection
+  const PortfolioExperienceBlocksModel = require('./models/PortfolioExperienceBlocks');
+  const ExternalLiveEndorsementsModel = require('./models/ExternalLiveEndorsements');
+  const MicroSuccessStoriesModel = require('./models/MicroSuccessStories');
+  const experienceBlocks = await PortfolioExperienceBlocksModel.getExperienceBlocksByPortfolioId(portfolio.id);
+  const endorsements = await ExternalLiveEndorsementsModel.getEndorsementsByPortfolioId(portfolio.id);
+  const personal = portfolio.personal_data_json || {};
+  const isPublished = portfolio.is_published_live;
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Preview — ${personal.fullName || slug}</title>
+  <style>body{font-family:system-ui,sans-serif;background:#030712;color:#e2e8f0;margin:0;padding:0}
+  .banner{background:${isPublished?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.15)'};border-bottom:1px solid ${isPublished?'rgba(16,185,129,0.3)':'rgba(239,68,68,0.3)'};padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .banner-badge{background:${isPublished?'rgba(16,185,129,0.2)':'rgba(239,68,68,0.2)'};color:${isPublished?'#10b981':'#ef4444'};border:1px solid ${isPublished?'rgba(16,185,129,0.4)':'rgba(239,68,68,0.4)'};padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700}
+  .banner-slug{font-family:monospace;background:rgba(255,255,255,0.06);padding:4px 10px;border-radius:8px;font-size:13px;color:#94a3b8}
+  h2{margin:0;font-size:15px;flex:1}
+  iframe{width:100%;border:0;height:calc(100vh - 60px)}
+  </style></head><body>
+  <div class="banner">
+    <h2>🔐 Super Admin Preview</h2>
+    <span class="banner-slug">${slug}</span>
+    <span class="banner-badge">${isPublished?'✅ Published':'⏸ Draft — Not Published'}</span>
+  </div>
+  <iframe src="/p/${encodeURIComponent(slug)}" ${isPublished ? '' : 'srcdoc="<html><body style=\'background:#020617;color:#e2e8f0;font-family:sans-serif;padding:40px;text-align:center;\'><h2 style=\'color:#f87171;\'>⏸ Portfolio is saved as Draft</h2><p>This portfolio has not been published yet by the user.</p><p style=\'color:#94a3b8;margin-top:16px;\'>Slug: ${encodeURIComponent(slug)}</p><hr style=\'border-color:#334155;margin:24px 0;\'><h3>Personal Data</h3><pre style=\'text-align:left;background:#0f172a;padding:16px;border-radius:12px;overflow:auto;font-size:12px;\'>${JSON.stringify(personal, null, 2)}</pre></body></html>"'} allow="fullscreen"></iframe>
+  </body></html>`);
 }));
 
 // Mount API routes (includes auth, portfolios, endorsements)
