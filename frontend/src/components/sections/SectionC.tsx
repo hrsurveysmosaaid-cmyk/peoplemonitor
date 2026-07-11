@@ -395,7 +395,7 @@ function SectionC({ t, personal, experiences, onChange }: Props) {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4">
-          <div className="glass-inner-card relative max-w-lg w-full p-6">
+          <div className="glass-inner-card relative max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 md:p-6">
 
                         <h3 className="text-xl font-bold text-white mb-4">{t.requestModalTitle}</h3>
             <p className="text-sm text-slate-300 mb-6">
