@@ -453,7 +453,7 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       const t = translations[currentLang];
       const rows = users.map(function(user) {
         const portfolioHtml = user.portfolios.map(function(p) {
-          const url = 'https://peopleos.online/' + p.slug;
+          const url = '/p/' + p.slug;
           return '<div>' + (p.slug ? '<a href="' + url + '" target="_blank" style="color: #4f46e5; text-decoration: underline; font-weight: 500;">' + p.slug + '</a>' : '-') + (p.isPublishedLive ? ' ✅' : '') + '</div>';
         }).join('');
         

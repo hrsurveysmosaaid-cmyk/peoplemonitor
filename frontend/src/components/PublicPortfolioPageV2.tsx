@@ -234,9 +234,9 @@ export default function PublicPortfolioPageV2() {
             return;
           }
         }
-      } catch {}
-      setModal({ open: true, type: 'text', text: (lang==='ar' ? 'تعذّر تحميل المستند مباشرةً. قد يكون هذا رابطاً خاصاً يحتاج معالجة خادمية وروابط موقّتة آمنة.' : 'Cannot load this document directly. This may be a private link that requires server-side processing and signed URLs.'), title: title || (lang==='ar'?'تنبيه المستند':'Document notice') });
-      return;
+      } catch (err) {
+        console.error(err);
+      }
     }
     if (lower.endsWith('.pdf')) setModal({ open: true, type: 'pdf', url, title });
     else if (lower.match(/\.(png|jpe?g|webp|gif|bmp|svg)$/)) setModal({ open: true, type: 'image', url, title });
@@ -245,66 +245,66 @@ export default function PublicPortfolioPageV2() {
   const openTextModal = (text: string, title?: string) => setModal({ open: true, type: 'text', text, title });
 
   const ProfileCard = (
-    <section className="glass-card p-8 rounded-[2.5rem]">
-      <div className={`relative z-10 flex flex-col md:flex-row md:items-start gap-8 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
+    <section className="glass-card p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem]">
+      <div className={`relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
         {profileResolvedUrl && (
           <img
             src={profileResolvedUrl}
             alt={personal.fullName}
-            className="w-32 h-32 rounded-full object-cover shadow-lg ring-4 ring-white/20"
+            className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover shadow-lg ring-4 ring-white/20 flex-shrink-0"
           />
         )}
-        <div className="flex-1 space-y-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1 flex flex-col items-center text-center">
-              <h1 className="text-4xl font-extrabold tracking-wide flex flex-wrap items-baseline justify-center gap-2">
+        <div className="flex-1 space-y-4 w-full">
+          <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-4 w-full">
+            <div className={`min-w-0 flex-1 flex flex-col items-center ${lang === 'ar' ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} text-center`}>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-wide flex flex-wrap items-baseline justify-center md:justify-start gap-2">
                 {personal.prefix && (
-                  <span className="text-4xl font-extrabold">{personal.prefix}</span>
+                  <span className="text-2xl md:text-4xl font-extrabold">{personal.prefix}</span>
                 )}
-                <span className="text-4xl font-extrabold truncate">{personal.fullName || (lang === 'ar' ? 'الاسم الكامل' : 'Full name')}</span>
+                <span className="text-2xl md:text-4xl font-extrabold break-words">{personal.fullName || (lang === 'ar' ? 'الاسم الكامل' : 'Full name')}</span>
               </h1>
-              <p className="text-xl font-semibold opacity-90">{personal.jobTitle || (lang === 'ar' ? 'المسمى الوظيفي' : 'Job title')}</p>
+              <p className="text-lg md:text-xl font-semibold opacity-90 mt-1">{personal.jobTitle || (lang === 'ar' ? 'المسمى الوظيفي' : 'Job title')}</p>
             </div>
-            <div className="shrink-0 flex flex-col items-end gap-2">
+            <div className="shrink-0 flex flex-row md:flex-col items-center md:items-end gap-2 flex-wrap justify-center w-full md:w-auto">
               {(() => {
                 const v = (personal as any).availability as string | undefined;
                 if (!v) return null;
                 const label = (() => {
-                  if (v === 'freelance') return lang === 'ar' ? 'متاح للعمل الحر فريلانس' : 'Available for freelance';
-                  if (v === 'consulting') return lang === 'ar' ? 'متاح للعقود والاستشارات' : 'Available for contracts & consulting';
+                  if (v === 'freelance') return lang === 'ar' ? 'متاح للعمل الحر' : 'Available for freelance';
+                  if (v === 'consulting') return lang === 'ar' ? 'متاح للعقود والاستشارات' : 'Available for contracts';
                   return lang === 'ar' ? 'متاح للعمل' : 'Open to work';
                 })();
                 return (
-                  <span className="text-xs font-semibold rounded-full px-3 py-1 border border-emerald-400/20 bg-emerald-500/10">
+                  <span className="text-[11px] md:text-xs font-semibold rounded-full px-2.5 py-1 border border-emerald-400/20 bg-emerald-500/10">
                     {label}
                   </span>
                 );
               })()}
               {(endorsements && endorsements.length > 0) && (
-                <div className="px-4 py-3 rounded-2xl border border-white/10 bg-white/10 shadow">
-                  <div className="text-xs font-semibold flex items-center gap-2">
-                    <Award size={14} />
+                <div className="px-3 py-1.5 md:py-2 rounded-xl border border-white/10 bg-white/10 shadow">
+                  <div className="text-[11px] md:text-xs font-semibold flex items-center gap-1.5">
+                    <Award size={13} />
                     <span>{lang === 'ar' ? 'توصية موثقة' : 'Verified endorsement'}</span>
                   </div>
                 </div>
-            )}
+              )}
             </div>
           </div>
 
           {(personal.email || personal.phone || personal.website || personal.linkedin || personal.github || (personal as any).behance) && (
-            <div className="grid grid-cols-3 gap-4 place-items-center text-sm pt-3 border-t border-white/10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 place-items-center md:place-items-start text-xs md:text-sm pt-4 border-t border-white/10">
               {personal.email && (
-                <a className="inline-flex items-center gap-2 hover:underline" href={`mailto:${personal.email}`}>
-                  <Mail size={16} /> {personal.email}
+                <a className="inline-flex items-center gap-2 hover:underline break-all" href={`mailto:${personal.email}`}>
+                  <Mail size={15} /> {personal.email}
                 </a>
               )}
               {personal.phone && (
                 <a className="inline-flex items-center gap-2 hover:underline" href={`tel:${personal.phone}`}>
-                  <Phone size={16} /> {personal.phone}
+                  <Phone size={15} /> {personal.phone}
                 </a>
               )}
               {(personal.website || personal.linkedin || personal.github || (personal as any).behance) && (
-                <div className="inline-flex items-center justify-center gap-3">
+                <div className="inline-flex items-center justify-center md:justify-start gap-3 w-full sm:col-span-2 md:col-span-1">
                   {personal.website && (
                     <a className="inline-flex items-center justify-center" href={normUrl(personal.website)} target="_blank" rel="noopener noreferrer" aria-label="Website">
                       <Globe size={18} />
@@ -327,19 +327,22 @@ export default function PublicPortfolioPageV2() {
                   )}
                 </div>
               )}
-              {personal.residencyStatus && (
-                <span className="text-xs rounded-full px-2 py-1 border border-white/10 bg-white/5">{personal.residencyStatus}</span>
-              )}
-              {personal.nationality && (
-                <span className="text-xs rounded-full px-2 py-1 border border-white/10 bg-white/5">{personal.nationality}</span>
-              )}
-              {birthDisplay && (
-                <span className="text-xs inline-flex items-center gap-1 rounded-full px-2 py-1 border border-white/10 bg-white/5">
-                  <Calendar size={14} /> {birthDisplay}
-                </span>
-              )}
             </div>
           )}
+
+          <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+            {personal.residencyStatus && (
+              <span className="text-[11px] md:text-xs rounded-full px-2 py-0.5 border border-white/10 bg-white/5">{personal.residencyStatus}</span>
+            )}
+            {personal.nationality && (
+              <span className="text-[11px] md:text-xs rounded-full px-2 py-0.5 border border-white/10 bg-white/5">{personal.nationality}</span>
+            )}
+            {birthDisplay && (
+              <span className="text-[11px] md:text-xs inline-flex items-center gap-1 rounded-full px-2 py-0.5 border border-white/10 bg-white/5">
+                <Calendar size={13} /> {birthDisplay}
+              </span>
+            )}
+          </div>
 
           {/* Languages */}
           {((personal as any).languages && (personal as any).languages.length > 0) && (
