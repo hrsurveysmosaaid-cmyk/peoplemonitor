@@ -215,8 +215,8 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       --card-border: rgba(255, 255, 255, 0.08);
       --text-color: #f8fafc;
       --text-muted: #94a3b8;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
       --danger: #ef4444;
       --danger-hover: #dc2626;
       --success: #10b981;
@@ -230,8 +230,8 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       --card-border: rgba(0, 0, 0, 0.08);
       --text-color: #0f172a;
       --text-muted: #64748b;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
       --danger: #ef4444;
       --danger-hover: #dc2626;
       --success: #10b981;
@@ -267,7 +267,30 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
 
     .control-actions { display: flex; gap: 12px; align-items: center; }
 
-    main { padding: 40px; flex-grow: 1; max-width: 1400px; width: 100%; margin: 0 auto; }
+    main { padding: 40px; flex-grow: 1; max-width: 1400px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+    
+    .tabs-container {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
     
     .panel-card {
       background: var(--card-bg);
@@ -276,6 +299,48 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       padding: 30px;
       backdrop-filter: blur(16px);
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .partner-form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .form-group input {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-color);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
     }
 
     .table-container { overflow-x: auto; margin-top: 24px; border-radius: 12px; border: 1px solid var(--card-border); }
@@ -312,6 +377,7 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
     .btn-secondary { background: var(--card-border); color: var(--text-color); }
 
     .status-msg { margin-top: 16px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -319,8 +385,8 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
     <div class="brand-section">
       <div class="brand-icon">🛡</div>
       <div class="brand-title">
-        <h1 data-key="title">بوابة المشرف العليا</h1>
-        <p data-key="subtitle">لوحة التحكم الفائقة للأنظمة المعزولة</p>
+        <h1 id="titleHeader">بوابة المشرف العليا</h1>
+        <p id="subtitleHeader">لوحة التحكم الفائقة للأنظمة المعزولة</p>
       </div>
     </div>
     <div class="control-actions">
@@ -329,14 +395,51 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         <option value="en">English (EN)</option>
       </select>
       <button id="themeToggle" class="btn-secondary">🌓</button>
-      <button id="refreshBtn" class="btn-primary">🔄 <span data-key="refreshBtn">تحديث البيانات</span></button>
+      <button id="refreshBtn" class="btn-primary">🔄 <span id="refreshBtnText">تحديث البيانات</span></button>
     </div>
   </header>
   
   <main>
-    <div class="panel-card">
+    <div class="tabs-container">
+      <button id="tabUsers" class="tab-btn active">👤 <span id="tabUsersText">المستخدمين</span></button>
+      <button id="tabPartners" class="tab-btn">🏫 <span id="tabPartnersText">المراكز التدريبية</span></button>
+    </div>
+
+    <!-- Users Panel -->
+    <div id="usersPanel" class="panel-card">
       <div class="status-msg" id="status"></div>
       <div class="table-container" id="usersTable"></div>
+    </div>
+
+    <!-- Partners Panel -->
+    <div id="partnersPanel" class="panel-card hidden">
+      <div class="partner-form-card">
+        <h3 id="formTitle" style="font-weight: 700; margin-bottom: 8px;">إضافة مركز تدريبي جديد</h3>
+        <form id="partnerForm" onsubmit="createPartner(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label id="lblPartnerName">اسم المركز</label>
+              <input id="partnerName" type="text" required placeholder="مثال: أكاديمية البرمجة" />
+            </div>
+            <div class="form-group">
+              <label id="lblPartnerSlug">الرمز التعريفي (Slug)</label>
+              <input id="partnerSlug" type="text" required placeholder="coding-academy" pattern="^[a-z0-9-]+$" title="Letters, numbers and hyphens only" />
+            </div>
+            <div class="form-group">
+              <label id="lblPartnerEmail">البريد الإلكتروني للمسؤول</label>
+              <input id="partnerEmail" type="email" required placeholder="admin@academy.com" />
+            </div>
+            <div class="form-group">
+              <label id="lblPartnerPassword">كلمة المرور</label>
+              <input id="partnerPassword" type="password" required placeholder="••••••••" />
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="margin-top: 16px;">➕ <span id="btnCreatePartner">إنشاء الحساب</span></button>
+        </form>
+      </div>
+
+      <div class="status-msg" id="partnerStatus"></div>
+      <div class="table-container" id="partnersTable"></div>
     </div>
   </main>
 
@@ -346,45 +449,67 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         title: "بوابة المشرف العليا",
         subtitle: "لوحة التحكم الفائقة للأنظمة المعزولة",
         refreshBtn: "تحديث البيانات",
-        loading: "جارٍ تحميل قائمة المستخدمين...",
-        loaded: "تم تحميل المستخدمين بنجاح",
-        failLoad: "فشل تحميل قائمة المستخدمين",
-        bridgeActive: "تم فتح جسر الوصول بنجاح",
-        deleteConfirm: "هل أنت متأكد من حذف هذا المستخدم وجميع البيانات المرتبطة به؟ لا يمكن التراجع عن هذا الإجراء.",
-        deleteSuccess: "تم حذف المستخدم بنجاح",
-        deleteFail: "فشل حذف المستخدم",
+        loading: "جاري التحميل...",
+        loaded: "تم تحديث البيانات",
+        failLoad: "فشل تحميل البيانات",
+        deleteConfirm: "هل أنت متأكد من الحذف؟ لا يمكن التراجع عن هذا الإجراء.",
+        deleteSuccess: "تم الحذف بنجاح",
+        deleteFail: "فشل الحذف",
         verified: "نعم",
         unverified: "لا",
         id: "ID",
-        name: "الاسم الكامل",
+        name: "الاسم",
         email: "البريد الإلكتروني",
         status: "موثق",
-        portfolios: "الحقائب (رابط مباشر)",
+        portfolios: "الحقائب",
         actions: "الإجراءات",
         bridgeBtn: "جسر الوصول العميق",
-        deleteBtn: "حذف"
+        deleteBtn: "حذف",
+        tabUsers: "إدارة الطلاب",
+        tabPartners: "إدارة المراكز التدريبية (الشركاء)",
+        partnerFormTitle: "إضافة مركز تدريبي جديد",
+        partnerName: "اسم المركز",
+        partnerSlug: "الرمز الفريد للرابط (Slug)",
+        partnerEmail: "بريد المسؤول",
+        partnerPassword: "كلمة المرور",
+        btnCreatePartner: "إنشاء الشريك",
+        partnerCreated: "تم إنشاء حساب الشريك بنجاح",
+        partnerCreateFail: "فشل إنشاء حساب الشريك",
+        totalStudents: "عدد الطلاب",
+        refLink: "رابط الإحالة المباشر"
       },
       en: {
         title: "Super Admin Gateway",
         subtitle: "Enterprise Super Admin Panel Control Hub",
         refreshBtn: "Refresh Data",
-        loading: "Loading user directory...",
-        loaded: "Users directory loaded successfully",
-        failLoad: "Failed to load user directory",
-        bridgeActive: "Access bridge created successfully",
-        deleteConfirm: "Are you sure you want to delete this user and all associated data? This action cannot be undone.",
-        deleteSuccess: "User deleted successfully",
-        deleteFail: "Failed to delete user",
+        loading: "Loading...",
+        loaded: "Data loaded successfully",
+        failLoad: "Failed to load data",
+        deleteConfirm: "Are you sure? This action cannot be undone.",
+        deleteSuccess: "Deleted successfully",
+        deleteFail: "Failed to delete",
         verified: "Yes",
         unverified: "No",
         id: "ID",
-        name: "Full Name",
+        name: "Name",
         email: "Email Address",
         status: "Verified",
-        portfolios: "Portfolios (Direct URL)",
+        portfolios: "Portfolios",
         actions: "Actions",
         bridgeBtn: "Deep Access Bridge",
-        deleteBtn: "Delete"
+        deleteBtn: "Delete",
+        tabUsers: "Manage Students",
+        tabPartners: "Manage Training Centers (Partners)",
+        partnerFormTitle: "Add New Training Center",
+        partnerName: "Center Name",
+        partnerSlug: "Referral Slug",
+        partnerEmail: "Admin Email",
+        partnerPassword: "Password",
+        btnCreatePartner: "Create Partner",
+        partnerCreated: "Partner account created successfully",
+        partnerCreateFail: "Failed to create partner account",
+        totalStudents: "Students Count",
+        refLink: "Referral Link"
       }
     };
 
@@ -392,24 +517,50 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
     document.getElementById('langSelect').value = currentLang;
     document.getElementById('adminHtml').dir = currentLang === 'ar' ? 'rtl' : 'ltr';
 
+    const updateTexts = () => {
+      const t = translations[currentLang];
+      document.getElementById('titleHeader').textContent = t.title;
+      document.getElementById('subtitleHeader').textContent = t.subtitle;
+      document.getElementById('refreshBtnText').textContent = t.refreshBtn;
+      document.getElementById('tabUsersText').textContent = t.tabUsers;
+      document.getElementById('tabPartnersText').textContent = t.tabPartners;
+      document.getElementById('formTitle').textContent = t.partnerFormTitle;
+      document.getElementById('lblPartnerName').textContent = t.partnerName;
+      document.getElementById('lblPartnerSlug').textContent = t.partnerSlug;
+      document.getElementById('lblPartnerEmail').textContent = t.partnerEmail;
+      document.getElementById('lblPartnerPassword').textContent = t.partnerPassword;
+      document.getElementById('btnCreatePartner').textContent = t.btnCreatePartner;
+    };
+
     const setLanguage = (lang) => {
       currentLang = lang;
       localStorage.setItem('adminLang', lang);
       document.getElementById('adminHtml').dir = lang === 'ar' ? 'rtl' : 'ltr';
-      document.querySelectorAll('[data-key]').forEach(el => {
-        const key = el.getAttribute('data-key');
-        if (translations[lang][key]) {
-          if (el.tagName === 'SPAN') {
-            el.textContent = translations[lang][key];
-          } else {
-            el.textContent = translations[lang][key];
-          }
-        }
-      });
-      loadUsers();
+      updateTexts();
+      loadData();
     };
 
     document.getElementById('langSelect').addEventListener('change', (e) => setLanguage(e.target.value));
+
+    // Tab switching
+    const tabUsers = document.getElementById('tabUsers');
+    const tabPartners = document.getElementById('tabPartners');
+    const usersPanel = document.getElementById('usersPanel');
+    const partnersPanel = document.getElementById('partnersPanel');
+
+    tabUsers.addEventListener('click', () => {
+      tabUsers.classList.add('active');
+      tabPartners.classList.remove('active');
+      usersPanel.classList.remove('hidden');
+      partnersPanel.classList.add('hidden');
+    });
+
+    tabPartners.addEventListener('click', () => {
+      tabPartners.classList.add('active');
+      tabUsers.classList.remove('active');
+      partnersPanel.classList.remove('hidden');
+      usersPanel.classList.add('hidden');
+    });
 
     // Theme toggler
     const themeToggle = document.getElementById('themeToggle');
@@ -425,12 +576,12 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
     });
 
     const statusEl = document.getElementById('status');
+    const partnerStatusEl = document.getElementById('partnerStatus');
     const usersTableEl = document.getElementById('usersTable');
-    const refreshBtn = document.getElementById('refreshBtn');
+    const partnersTableEl = document.getElementById('partnersTable');
 
     const deleteUser = async (userId) => {
       if (!confirm(translations[currentLang].deleteConfirm)) return;
-      
       statusEl.textContent = "...";
       try {
         const res = await fetch('/api/admin/users/' + userId, { method: 'DELETE' });
@@ -446,6 +597,50 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       }
     };
 
+    const deletePartner = async (partnerId) => {
+      if (!confirm(translations[currentLang].deleteConfirm)) return;
+      partnerStatusEl.textContent = "...";
+      try {
+        const res = await fetch('/api/admin/partners/' + partnerId, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+          partnerStatusEl.textContent = translations[currentLang].deleteSuccess;
+          loadPartners();
+        } else {
+          partnerStatusEl.textContent = (data.error || translations[currentLang].deleteFail);
+        }
+      } catch (err) {
+        partnerStatusEl.textContent = translations[currentLang].deleteFail;
+      }
+    };
+
+    const createPartner = async (e) => {
+      e.preventDefault();
+      partnerStatusEl.textContent = "...";
+      const name = document.getElementById('partnerName').value;
+      const slug = document.getElementById('partnerSlug').value;
+      const adminEmail = document.getElementById('partnerEmail').value;
+      const password = document.getElementById('partnerPassword').value;
+
+      try {
+        const res = await fetch('/api/admin/partners', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, slug, adminEmail, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          partnerStatusEl.textContent = translations[currentLang].partnerCreated;
+          document.getElementById('partnerForm').reset();
+          loadPartners();
+        } else {
+          partnerStatusEl.textContent = data.error || translations[currentLang].partnerCreateFail;
+        }
+      } catch {
+        partnerStatusEl.textContent = translations[currentLang].partnerCreateFail;
+      }
+    };
+
     const renderUsers = (users) => {
       if (!users.length) {
         usersTableEl.innerHTML = '<p style="padding: 24px; text-align: center;">No users found.</p>';
@@ -457,15 +652,13 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         const portfolioHtml = user.portfolios.length === 0 ? '<span style="color:#64748b;font-size:12px;">No portfolio</span>' : user.portfolios.map(function(p) {
           if (!p.slug) return '<span style="color:#64748b;font-size:12px;">—</span>';
           if (p.isPublishedLive) {
-            // Published: show clickable public link
-            return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+            return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">' +
               '<a href="/p/' + p.slug + '" target="_blank" style="color:#4f46e5;text-decoration:underline;font-weight:500;font-size:13px;">' + p.slug + '</a>' +
               '<span style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;">✅ Live</span>' +
               '<a href="/super-admin/preview-portfolio/' + p.slug + '" target="_blank" style="background:rgba(99,102,241,0.15);color:#6366f1;border:1px solid rgba(99,102,241,0.3);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;text-decoration:none;">👁 Preview</a>' +
             '</div>';
           } else {
-            // Unpublished / Draft: no public link, but admin can preview
-            return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
+            return '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">' +
               '<span style="color:#94a3b8;font-size:13px;">' + p.slug + '</span>' +
               '<span style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;">⏸ Draft</span>' +
               '<a href="/super-admin/preview-portfolio/' + p.slug + '" target="_blank" style="background:rgba(99,102,241,0.15);color:#6366f1;border:1px solid rgba(99,102,241,0.3);padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;text-decoration:none;">👁 Preview</a>' +
@@ -501,7 +694,6 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         '<tbody>' + rows + '</tbody>' +
       '</table>';
 
-      // Event Listeners for Bridge
       document.querySelectorAll('[data-bridge-id]').forEach((button) => {
         button.addEventListener('click', async () => {
           const userId = button.getAttribute('data-bridge-id');
@@ -513,15 +705,55 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
             return;
           }
           window.open(payload.data.bridgeUrl, '_blank');
-          statusEl.textContent = t.bridgeActive;
+          statusEl.textContent = t.loaded;
         });
       });
 
-      // Event Listeners for Delete
       document.querySelectorAll('[data-delete-id]').forEach((button) => {
         button.addEventListener('click', () => {
-          const userId = button.getAttribute('data-delete-id');
-          deleteUser(userId);
+          deleteUser(button.getAttribute('data-delete-id'));
+        });
+      });
+    };
+
+    const renderPartners = (partners) => {
+      if (!partners.length) {
+        partnersTableEl.innerHTML = '<p style="padding: 24px; text-align: center;">No partners found.</p>';
+        return;
+      }
+
+      const t = translations[currentLang];
+      const origin = window.location.origin;
+
+      const rows = partners.map(function(partner) {
+        const refUrl = origin + '/register?ref=' + partner.slug;
+        return '<tr>' +
+          '<td>' + partner.id + '</td>' +
+          '<td><strong>' + partner.name + '</strong><br/><small style="color:var(--text-muted)">slug: ' + partner.slug + '</small></td>' +
+          '<td>' + partner.adminEmail + '</td>' +
+          '<td><span class="badge-verified">' + partner.totalStudents + '</span></td>' +
+          '<td><a href="' + refUrl + '" target="_blank" style="color:var(--primary); font-size:12px; text-decoration:underline;">' + refUrl + '</a></td>' +
+          '<td>' +
+            '<button class="btn-danger" data-partner-delete-id="' + partner.id + '">🗑 ' + t.deleteBtn + '</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+
+      partnersTableEl.innerHTML = '<table>' +
+        '<thead><tr>' +
+          '<th>' + t.id + '</th>' +
+          '<th>' + t.name + '</th>' +
+          '<th>' + t.email + '</th>' +
+          '<th>' + t.totalStudents + '</th>' +
+          '<th>' + t.refLink + '</th>' +
+          '<th>' + t.actions + '</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>';
+
+      document.querySelectorAll('[data-partner-delete-id]').forEach((button) => {
+        button.addEventListener('click', () => {
+          deletePartner(button.getAttribute('data-partner-delete-id'));
         });
       });
     };
@@ -542,8 +774,35 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       }
     };
 
-    refreshBtn.addEventListener('click', loadUsers);
-    loadUsers();
+    const loadPartners = async () => {
+      partnerStatusEl.textContent = translations[currentLang].loading;
+      try {
+        const response = await fetch('/api/admin/partners?t=' + new Date().getTime());
+        const payload = await response.json();
+        if (!payload.success) {
+          partnerStatusEl.textContent = payload.error || translations[currentLang].failLoad;
+          return;
+        }
+        renderPartners(payload.data);
+        partnerStatusEl.textContent = translations[currentLang].loaded;
+      } catch {
+        partnerStatusEl.textContent = translations[currentLang].failLoad;
+      }
+    };
+
+    const loadData = () => {
+      loadUsers();
+      loadPartners();
+    };
+
+    document.getElementById('refreshBtn').addEventListener('click', loadData);
+    
+    // Initial Load
+    updateTexts();
+    loadData();
+  </script>
+</body>
+</html>`;
   </script>
 </body>
 </html>`;
