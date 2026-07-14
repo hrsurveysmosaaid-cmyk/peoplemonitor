@@ -9,6 +9,8 @@ import PublicPortfolioPageV2 from './components/PublicPortfolioPageV2';
 import EndorsementPage from './components/EndorsementPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import PartnerLoginPage from './components/PartnerLoginPage';
+import PartnerDashboardPage from './components/PartnerDashboardPage';
 
 // Protected Route Guard
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -109,6 +111,17 @@ function App() {
             <ProtectedRoute>
               <DashboardPage />
             </ProtectedRoute>
+          }
+        />
+
+        {/* Partner Portal routes */}
+        <Route path="/partner/login" element={<PartnerLoginPage />} />
+        <Route
+          path="/partner/dashboard"
+          element={
+            localStorage.getItem('partnerToken')
+              ? <PartnerDashboardPage />
+              : <Navigate to="/partner/login" replace />
           }
         />
 

@@ -2,6 +2,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const GlobalUsersModel = require('../models/GlobalUsers');
+const PartnersModel = require('../models/Partners');
 const { sendOTPEmail, sendPasswordResetEmail, sendWelcomeEmail } = require('../config/mail');
 const { generateOTP, validateEmail } = require('../utils/helpers');
 
@@ -11,7 +12,7 @@ const { generateOTP, validateEmail } = require('../utils/helpers');
  */
 const signup = async (req, res, next) => {
   try {
-    const { fullName, email, password, confirmPassword } = req.body;
+    const { fullName, email, password, confirmPassword, partnerSlug } = req.body;
 
     // Validate required fields
     if (!fullName || !email || !password || !confirmPassword) {
@@ -61,6 +62,13 @@ const signup = async (req, res, next) => {
     // Generate OTP
     const otpToken = generateOTP(6);
 
+    // Resolve partner_id from referral slug (optional)
+    let partnerId = null;
+    if (partnerSlug && typeof partnerSlug === 'string' && partnerSlug.trim()) {
+      const partner = await PartnersModel.getPartnerBySlug(partnerSlug.trim());
+      if (partner) partnerId = partner.id;
+    }
+
     // Create user with is_verified = false
     const newUser = await GlobalUsersModel.createUser({
       fullName: fullName.trim(),
@@ -68,6 +76,7 @@ const signup = async (req, res, next) => {
       passSecureHash: hashedPassword,
       authProvider: 'local',
       isVerified: false,
+      partnerId,
     });
 
     // Set OTP token

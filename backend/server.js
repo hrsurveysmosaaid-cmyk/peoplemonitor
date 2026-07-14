@@ -18,6 +18,7 @@ const CorePortfoliosModel = require('./models/CorePortfolios');
 const PortfolioExperienceBlocksModel = require('./models/PortfolioExperienceBlocks');
 const MicroSuccessStoriesModel = require('./models/MicroSuccessStories');
 const ExternalLiveEndorsementsModel = require('./models/ExternalLiveEndorsements');
+const PartnersModel = require('./models/Partners');
 
 // Initialize Express app
 const app = express();
@@ -56,6 +57,7 @@ const initializeTables = async () => {
     await PortfolioExperienceBlocksModel.createPortfolioExperienceBlocksTable();
     await MicroSuccessStoriesModel.createMicroSuccessStoriesTable();
     await ExternalLiveEndorsementsModel.createExternalLiveEndorsementsTable();
+    await PartnersModel.createPartnersTable();
     console.log('\n✅ All database tables initialized successfully\n');
   } catch (error) {
     console.error('❌ Error initializing database tables:', error.message);

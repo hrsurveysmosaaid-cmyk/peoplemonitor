@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUi } from '../ui/UiContext';
 import { Languages, Moon, Sun } from 'lucide-react';
 
@@ -23,6 +23,14 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // Referral / Partner slug from URL ?ref=slug
+  const [searchParams] = useSearchParams();
+  const [partnerSlug] = useState(() => {
+    const ref = searchParams.get('ref') || sessionStorage.getItem('partnerRef') || '';
+    if (ref) sessionStorage.setItem('partnerRef', ref);
+    return ref;
+  });
 
   // OTP state
   const [otp, setOtp] = useState('');
@@ -54,7 +62,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName, email, password, confirmPassword })
+        body: JSON.stringify({ fullName, email, password, confirmPassword, partnerSlug: partnerSlug || undefined })
       });
       const data = await res.json();
 

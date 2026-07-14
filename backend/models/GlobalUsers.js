@@ -34,16 +34,16 @@ const createGlobalUsersTable = async () => {
  * Create new user
  */
 const createUser = async (userData) => {
-  const { fullName, email, passSecureHash, authProvider = 'local', isVerified = false } = userData;
+  const { fullName, email, passSecureHash, authProvider = 'local', isVerified = false, partnerId = null } = userData;
   
   const query = `
     INSERT INTO global_users 
-    (full_name, email, pass_secure_hash, auth_provider, is_verified) 
-    VALUES (?, ?, ?, ?, ?)
+    (full_name, email, pass_secure_hash, auth_provider, is_verified, partner_id) 
+    VALUES (?, ?, ?, ?, ?, ?)
   `;
   
   try {
-    const result = await executeQuery(query, [fullName, email, passSecureHash, authProvider, isVerified]);
+    const result = await executeQuery(query, [fullName, email, passSecureHash, authProvider, isVerified, partnerId]);
     return { id: result.insertId, ...userData };
   } catch (error) {
     throw new Error(`Failed to create user: ${error.message}`);

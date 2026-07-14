@@ -4,15 +4,18 @@ const router = express.Router();
 const { asyncHandler } = require('../middleware/errorHandler');
 const { authenticate, optionalAuthenticate } = require('../middleware/authentication');
 const { validateSuperAdminSession } = require('../middleware/superAdminAuth');
+const { authenticatePartner } = require('../middleware/partnerAuth');
 const authController = require('../controllers/authController');
 const googleAuthController = require('../controllers/googleAuthController');
 const pdfController = require('../controllers/pdfController');
 const endorsementController = require('../controllers/endorsementController');
 const adminController = require('../controllers/adminController');
+const partnerController = require('../controllers/partnerController');
 const CorePortfoliosModel = require('../models/CorePortfolios');
 const PortfolioExperienceBlocksModel = require('../models/PortfolioExperienceBlocks');
 const ExternalLiveEndorsementsModel = require('../models/ExternalLiveEndorsements');
 const GlobalUsersModel = require('../models/GlobalUsers');
+const PartnersModel = require('../models/Partners');
 
 /**
  * API Routes Aggregator
@@ -703,6 +706,65 @@ router.post('/admin/users/:userId/deep-portal', validateSuperAdminSession(), asy
  * DELETE /admin/users/:userId
  */
 router.delete('/admin/users/:userId', validateSuperAdminSession(), asyncHandler(adminController.deleteUser));
+
+// ============================================
+// Admin — Partner / Center Management
+// ============================================
+
+/**
+ * List all partners
+ * GET /api/admin/partners
+ */
+router.get('/admin/partners', validateSuperAdminSession(), asyncHandler(async (req, res) => {
+  const partners = await PartnersModel.listAllPartners();
+  return res.json({ success: true, data: partners });
+}));
+
+/**
+ * Create a new partner
+ * POST /api/admin/partners
+ * Body: { name, slug, adminEmail, password, logoUrl? }
+ */
+router.post('/admin/partners', validateSuperAdminSession(), asyncHandler(async (req, res) => {
+  const { name, slug, adminEmail, password, logoUrl } = req.body;
+  if (!name || !slug || !adminEmail || !password) {
+    return res.status(400).json({ success: false, error: 'name, slug, adminEmail and password are required' });
+  }
+  const partner = await PartnersModel.createPartner({ name, slug, logoUrl, adminEmail, password });
+  return res.status(201).json({ success: true, data: partner });
+}));
+
+/**
+ * Delete a partner
+ * DELETE /api/admin/partners/:id
+ */
+router.delete('/admin/partners/:id', validateSuperAdminSession(), asyncHandler(async (req, res) => {
+  await PartnersModel.deletePartner(req.params.id);
+  return res.json({ success: true, message: 'Partner deleted successfully' });
+}));
+
+// ============================================
+// Partner (Training Center) Routes
+// ============================================
+
+/**
+ * Partner Login
+ * POST /api/partner/login
+ * Body: { email, password }
+ */
+router.post('/partner/login', asyncHandler(partnerController.login));
+
+/**
+ * Get partner profile + stats
+ * GET /api/partner/me
+ */
+router.get('/partner/me', authenticatePartner(), asyncHandler(partnerController.getMe));
+
+/**
+ * Get partner's students
+ * GET /api/partner/students
+ */
+router.get('/partner/students', authenticatePartner(), asyncHandler(partnerController.getStudents));
 
 // ============================================
 // User Routes (to be implemented)
