@@ -171,7 +171,7 @@ export default function PrivacyPolicyPage() {
                 : 'If you have any questions about this agreement or wish to request data actions, please contact our support team at:'}
             </p>
             <p className="text-sky-400 text-base font-bold">
-              support@peopleos.online
+              info@peopleos-hr.com
             </p>
           </section>
         </div>
