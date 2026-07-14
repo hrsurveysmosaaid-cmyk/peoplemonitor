@@ -22,6 +22,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // OTP state
   const [otp, setOtp] = useState('');
@@ -269,8 +270,47 @@ export default function RegisterPage() {
                   disabled={loading}
                 />
               </label>
+              <label className="flex items-start gap-2 cursor-pointer mt-4 select-none">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-sky-500 focus:ring-sky-500"
+                  disabled={loading}
+                />
+                <span className="text-slate-400 text-xs leading-relaxed">
+                  {lang === 'ar' ? (
+                    <>
+                      أوافق على{' '}
+                      <button
+                        type="button"
+                        onClick={() => navigate('/privacy-policy')}
+                        className="text-sky-400 font-semibold hover:underline inline"
+                      >
+                        سياسة الخصوصية وشروط الاستخدام
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      I agree to the{' '}
+                      <button
+                        type="button"
+                        onClick={() => navigate('/privacy-policy')}
+                        className="text-sky-400 font-semibold hover:underline inline"
+                      >
+                        Privacy Policy & Terms of Use
+                      </button>
+                    </>
+                  )}
+                </span>
+              </label>
 
-              <button id="btn-signup-submit" type="submit" disabled={loading} className="button-primary w-full py-3 mt-2 text-base disabled:opacity-60">
+              <button 
+                id="btn-signup-submit" 
+                type="submit" 
+                disabled={loading || !agreedToTerms} 
+                className="button-primary w-full py-3 mt-2 text-base disabled:opacity-60"
+              >
                 {loading ? (t.checking || 'Checking…') : (t.register || 'Register')}
               </button>
 
@@ -278,8 +318,18 @@ export default function RegisterPage() {
                 <button onClick={() => navigate('/login')} type="button" className="text-sky-400 text-sm font-semibold hover:underline">
                   ← {t.backToLogin || 'Back to login'}
                 </button>
-            </div>
+              </div>
             </form>
+            
+            <div className="mt-6 pt-4 border-t border-white/5 text-center">
+              <button
+                type="button"
+                onClick={() => navigate('/privacy-policy')}
+                className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                {lang === 'ar' ? 'سياسة الخصوصية وشروط الاستخدام' : 'Privacy Policy & Terms of Use'}
+              </button>
+            </div>
           </>
         ) : (
           // OTP verification view

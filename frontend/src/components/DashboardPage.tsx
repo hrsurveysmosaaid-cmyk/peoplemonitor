@@ -485,6 +485,20 @@ export default function DashboardPage() {
             }}
           />
         </main>
+        
+        <footer className={`mt-12 py-6 border-t text-center space-y-2 transition-all duration-300 ${isDark ? 'border-white/10 text-slate-500' : 'border-slate-200 text-slate-400'}`}>
+          <p className="text-xs">
+            &copy; {new Date().getFullYear()} People Monitor. {lang === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}
+          </p>
+          <div>
+            <button
+              onClick={() => navigate('/privacy-policy')}
+              className="text-xs text-sky-500 hover:text-sky-400 font-semibold hover:underline"
+            >
+              {lang === 'ar' ? 'سياسة الخصوصية وشروط الاستخدام' : 'Privacy Policy & Terms of Use'}
+            </button>
+          </div>
+        </footer>
       </div>
       <PublishModal
         open={showPublish}

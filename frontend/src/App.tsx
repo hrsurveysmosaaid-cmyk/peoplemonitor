@@ -8,6 +8,7 @@ import DashboardPage from './components/DashboardPage';
 import PublicPortfolioPageV2 from './components/PublicPortfolioPageV2';
 import EndorsementPage from './components/EndorsementPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 
 // Protected Route Guard
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -97,6 +98,9 @@ function App() {
 
         {/* Password reset route */}
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Privacy Policy route */}
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
         {/* Protected Dashboard workstation */}
         <Route

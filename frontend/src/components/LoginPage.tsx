@@ -370,7 +370,7 @@ export default function LoginPage() {
               </>
             )}
 
-            <div className="mt-8 pt-6 border-t border-white/10 text-center">
+            <div className="mt-8 pt-6 border-t border-white/10 text-center space-y-4">
               <p className="text-sm text-slate-400">
                 {t.noAccountYet || "Don't have an account?"}{' '}
                 <button
@@ -380,6 +380,15 @@ export default function LoginPage() {
                   {t.register || 'Register'}
                 </button>
               </p>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/privacy-policy')}
+                  className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                >
+                  {lang === 'ar' ? 'سياسة الخصوصية وشروط الاستخدام' : 'Privacy Policy & Terms of Use'}
+                </button>
+              </div>
             </div>
           </>
         ) : (
