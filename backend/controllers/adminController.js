@@ -11,27 +11,47 @@ const listUsers = async (req, res, next) => {
         u.is_verified AS isVerified,
         u.record_created AS createdAt,
         p.unique_slug_string AS portfolioSlug,
-        p.is_published_live AS isPublishedLive
+        p.is_published_live AS isPublishedLive,
+        p.personal_data_json AS personalData,
+        pt.name AS partnerName
       FROM global_users u
       LEFT JOIN core_portfolios p ON p.user_id = u.id
+      LEFT JOIN partners pt ON pt.id = u.partner_id
       ORDER BY u.id DESC, p.id DESC
     `;
 
     const results = await executeQuery(query);
     const users = results.reduce((acc, row) => {
       const existing = acc.find((item) => item.id === row.id);
+      
+      let jobTitle = '—';
+      if (row.personalData) {
+        try {
+          const parsed = typeof row.personalData === 'string' ? JSON.parse(row.personalData) : row.personalData;
+          jobTitle = parsed.designation || parsed.jobTitle || parsed.profileTitle || parsed.title || '—';
+        } catch (e) {
+          // ignore parsing error
+        }
+      }
+
       if (existing) {
         if (row.portfolioSlug) {
           existing.portfolios.push({ slug: row.portfolioSlug, isPublishedLive: !!row.isPublishedLive });
         }
+        if (existing.jobTitle === '—' && jobTitle !== '—') {
+          existing.jobTitle = jobTitle;
+        }
         return acc;
       }
+
       acc.push({
         id: row.id,
         fullName: row.fullName,
         email: row.email,
         isVerified: !!row.isVerified,
         createdAt: row.createdAt,
+        partnerName: row.partnerName || null,
+        jobTitle: jobTitle,
         portfolios: row.portfolioSlug ? [{ slug: row.portfolioSlug, isPublishedLive: !!row.isPublishedLive }] : [],
       });
       return acc;

@@ -476,7 +476,9 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         partnerCreated: "تم إنشاء حساب الشريك بنجاح",
         partnerCreateFail: "فشل إنشاء حساب الشريك",
         totalStudents: "عدد الطلاب",
-        refLink: "رابط الإحالة المباشر"
+        refLink: "رابط الإحالة المباشر",
+        jobTitle: "المسمى الوظيفي",
+        partnerCenter: "الجهة/المركز"
       },
       en: {
         title: "Super Admin Gateway",
@@ -509,7 +511,9 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         partnerCreated: "Partner account created successfully",
         partnerCreateFail: "Failed to create partner account",
         totalStudents: "Students Count",
-        refLink: "Referral Link"
+        refLink: "Referral Link",
+        jobTitle: "Job Title",
+        partnerCenter: "Partner/Center"
       }
     };
 
@@ -668,11 +672,17 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         
         const badgeClass = user.isVerified ? 'badge-verified' : 'badge-unverified';
         const badgeText = user.isVerified ? t.verified : t.unverified;
+        
+        const partnerNameHtml = user.partnerName 
+          ? '<span style="background:rgba(99,102,241,0.15);color:#6366f1;border:1px solid rgba(99,102,241,0.3);padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;">🏫 ' + user.partnerName + '</span>'
+          : '<span style="color:#64748b;font-size:12px;">مستقل / Independent</span>';
 
         return '<tr>' +
           '<td>' + user.id + '</td>' +
           '<td><strong>' + user.fullName + '</strong></td>' +
           '<td>' + user.email + '</td>' +
+          '<td><span style="font-weight:500;">' + user.jobTitle + '</span></td>' +
+          '<td>' + partnerNameHtml + '</td>' +
           '<td><span class="' + badgeClass + '">' + badgeText + '</span></td>' +
           '<td>' + portfolioHtml + '</td>' +
           '<td style="display: flex; gap: 8px;">' +
@@ -687,6 +697,8 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
           '<th>' + t.id + '</th>' +
           '<th>' + t.name + '</th>' +
           '<th>' + t.email + '</th>' +
+          '<th>' + t.jobTitle + '</th>' +
+          '<th>' + t.partnerCenter + '</th>' +
           '<th>' + t.status + '</th>' +
           '<th>' + t.portfolios + '</th>' +
           '<th>' + t.actions + '</th>' +

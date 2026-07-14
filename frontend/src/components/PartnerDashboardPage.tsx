@@ -4,7 +4,7 @@ import { useUi } from '../ui/UiContext';
 import {
   Users, Globe, FileText, Copy, CheckCheck,
   LogOut, Moon, Sun, Languages, Search, ExternalLink,
-  TrendingUp, UserCheck, Building2, Link as LinkIcon
+  UserCheck, Building2, Link as LinkIcon, Calendar, Mail, ShieldAlert
 } from 'lucide-react';
 
 interface Student {
@@ -102,103 +102,123 @@ export default function PartnerDashboardPage() {
     return (
       <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
         <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-sky-500/30 border-t-sky-500 rounded-full animate-spin mx-auto" />
-          <p className="text-slate-400 text-sm">{isAr ? 'جاري التحميل...' : 'Loading...'}</p>
+          <div className="w-12 h-12 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto" />
+          <p className="text-slate-400 text-sm font-medium animate-pulse">{isAr ? 'جاري التحميل...' : 'Loading...'}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} px-4 py-8 md:px-10 lg:px-16 transition-colors duration-300`}>
-      <div className="mx-auto max-w-[1280px] space-y-6">
+    <div className={`min-h-screen ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} px-4 py-8 md:px-10 lg:px-16 transition-colors duration-300 relative`}>
+      {/* Decorative blurred backgrounds */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
+        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-indigo-500/5 blur-3xl" />
+        <div className="absolute bottom-10 left-10 w-[450px] h-[450px] rounded-full bg-sky-500/5 blur-3xl" />
+      </div>
+
+      <div className="mx-auto max-w-[1280px] space-y-8 relative z-10">
 
         {/* Header */}
-        <header className={`rounded-[2rem] border p-6 shadow-glass backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${isDark ? 'border-white/10 bg-slate-950/80' : 'border-slate-200 bg-white/90'}`}>
-          <div>
-            <p className="text-sky-500 text-xs uppercase tracking-[0.3em] font-bold">
-              {isAr ? 'لوحة تحكم المركز التدريبي' : 'Training Center Dashboard'}
-            </p>
-            <h1 className={`mt-1 text-2xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-              {profile?.name || 'Partner'}
-            </h1>
-            <p className="text-slate-500 text-xs mt-1">{profile?.adminEmail}</p>
+        <header className={`rounded-3xl border p-6 shadow-2xl backdrop-blur-xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all duration-300 ${isDark ? 'border-white/10 bg-slate-900/60' : 'border-slate-200/80 bg-white/80'}`}>
+          <div className="flex items-center gap-4">
+            <div className={`p-3 rounded-2xl ${isDark ? 'bg-indigo-500/10 border border-indigo-500/20' : 'bg-indigo-50 border border-indigo-100'}`}>
+              <Building2 size={28} className="text-indigo-500" />
+            </div>
+            <div>
+              <p className="text-indigo-500 text-[10px] uppercase tracking-[0.25em] font-extrabold">
+                {isAr ? 'بوابة الشركاء والمراكز' : 'PARTNER PORTAL'}
+              </p>
+              <h1 className={`mt-0.5 text-2xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                {profile?.name || 'Partner'}
+              </h1>
+              <p className="text-slate-500 text-xs mt-1 flex items-center gap-1.5">
+                <Mail size={12} />
+                {profile?.adminEmail}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <button className="icon-button" onClick={toggleTheme} aria-label="toggle theme">
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            <button className="icon-button w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200/40 hover:scale-105 transition-transform" onClick={toggleTheme} aria-label="toggle theme">
+              {isDark ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-indigo-500" />}
             </button>
-            <button className="icon-button flex items-center gap-1 text-xs font-bold" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>
+            <button className="icon-button px-3 h-10 flex items-center gap-1.5 text-xs font-bold rounded-xl border border-slate-200/40 hover:scale-105 transition-transform" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>
               <Languages size={16} />
               <span>{lang === 'en' ? 'ع' : 'EN'}</span>
             </button>
-            <button className="icon-button" onClick={handleLogout} title={isAr ? 'خروج' : 'Logout'}>
-              <LogOut size={16} />
+            <button className="icon-button w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors" onClick={handleLogout} title={isAr ? 'خروج' : 'Logout'}>
+              <LogOut size={18} />
             </button>
           </div>
         </header>
 
         {error && (
-          <div className="p-4 rounded-2xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center">{error}</div>
+          <div className="p-4 rounded-2xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm text-center flex items-center justify-center gap-2">
+            <ShieldAlert size={16} />
+            {error}
+          </div>
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {[
-            { icon: <Users size={22} />, label: isAr ? 'إجمالي الطلاب' : 'Total Students', value: profile?.totalStudents ?? 0, color: 'text-sky-400' },
-            { icon: <FileText size={22} />, label: isAr ? 'أكملوا السيرة الذاتية' : 'CV Completed', value: completedCount, color: 'text-indigo-400' },
-            { icon: <Globe size={22} />, label: isAr ? 'سير ذاتية منشورة' : 'Published CVs', value: profile?.publishedCount ?? 0, color: 'text-emerald-400' },
+            { icon: <Users size={24} />, label: isAr ? 'إجمالي الطلاب' : 'Total Students', value: profile?.totalStudents ?? 0, color: 'text-indigo-500', bg: 'from-indigo-500/20 to-indigo-500/5' },
+            { icon: <FileText size={24} />, label: isAr ? 'أكملوا السيرة الذاتية' : 'CV Completed', value: completedCount, color: 'text-sky-500', bg: 'from-sky-500/20 to-sky-500/5' },
+            { icon: <Globe size={24} />, label: isAr ? 'سير ذاتية منشورة' : 'Published CVs', value: profile?.publishedCount ?? 0, color: 'text-emerald-500', bg: 'from-emerald-500/20 to-emerald-500/5' },
           ].map((card, i) => (
-            <div key={i} className={`rounded-2xl border p-5 flex items-center gap-4 ${isDark ? 'border-white/10 bg-slate-900/50' : 'border-slate-200 bg-white'}`}>
-              <div className={`${card.color} p-3 rounded-xl ${isDark ? 'bg-white/5' : 'bg-slate-100'}`}>{card.icon}</div>
+            <div key={i} className={`rounded-3xl border p-6 flex items-center gap-5 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${isDark ? 'border-white/5 bg-slate-900/40' : 'border-slate-200 bg-white'}`}>
+              <div className={`p-3.5 rounded-2xl bg-gradient-to-br ${card.bg} ${card.color}`}>{card.icon}</div>
               <div>
-                <p className="text-slate-400 text-xs">{card.label}</p>
-                <p className={`text-2xl font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}`}>{card.value}</p>
+                <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider">{card.label}</p>
+                <p className={`text-3xl font-black mt-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{card.value}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Referral Link Card */}
-        <div className={`rounded-2xl border p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 ${isDark ? 'border-sky-500/20 bg-sky-500/5' : 'border-sky-200 bg-sky-50'}`}>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <LinkIcon size={16} className="text-sky-400" />
-              <p className="text-sky-400 text-sm font-bold">{isAr ? 'رابط الإحالة الخاص بمركزكم' : 'Your Center Referral Link'}</p>
+        <div className={`rounded-3xl border p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all duration-300 ${isDark ? 'border-indigo-500/20 bg-indigo-950/20' : 'border-indigo-100 bg-indigo-50/50'}`}>
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center gap-2">
+              <LinkIcon size={18} className="text-indigo-500" />
+              <h2 className="text-indigo-500 text-sm font-black uppercase tracking-wider">{isAr ? 'رابط التسجيل للمركز' : 'Your Referral Link'}</h2>
             </div>
-            <p className="text-xs text-slate-400 mb-2">{isAr ? 'شاركوا هذا الرابط مع الطلاب ليتم ربطهم تلقائياً بمركزكم عند التسجيل.' : 'Share this link with students so they get automatically linked to your center when they register.'}</p>
-            <input
-              readOnly
-              value={referralUrl}
-              className={`w-full rounded-xl px-3 py-2 text-xs font-mono ${isDark ? 'bg-slate-900 text-sky-300 border border-sky-500/20' : 'bg-white text-sky-700 border border-sky-200'}`}
-            />
+            <p className="text-xs text-slate-500 leading-relaxed max-w-2xl">{isAr ? 'شارك هذا الرابط مع طلابك. بمجرد قيامهم بالتسجيل من خلاله، سيتم ربطهم تلقائياً بهذا الحساب لتتمكن من متابعة سيرهم الذاتية وتفاصيلهم.' : 'Share this link with your students. Upon registration, they will be automatically linked to this account for tracking.'}</p>
+            <div className="relative mt-3">
+              <input
+                readOnly
+                value={referralUrl}
+                onClick={copyReferral}
+                className={`w-full rounded-2xl px-4 py-3.5 text-xs font-mono cursor-pointer transition-all duration-300 ${isDark ? 'bg-slate-900/90 text-indigo-300 border border-white/5 focus:border-indigo-500/50' : 'bg-white text-indigo-700 border border-slate-200 focus:border-indigo-500'}`}
+              />
+            </div>
           </div>
-          <button onClick={copyReferral} className="button-primary flex items-center gap-2 text-sm whitespace-nowrap">
-            {copied ? <CheckCheck size={15} /> : <Copy size={15} />}
-            {copied ? (isAr ? 'تم النسخ!' : 'Copied!') : (isAr ? 'نسخ الرابط' : 'Copy Link')}
+          <button onClick={copyReferral} className={`button-primary flex items-center gap-2 text-sm px-6 py-3.5 rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-indigo-500/20 ${copied ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}>
+            {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+            {copied ? (isAr ? 'تم النسخ!' : 'Copied!') : (isAr ? 'نسخ رابط المركز' : 'Copy referral Link')}
           </button>
         </div>
 
         {/* Students Table */}
-        <div className={`rounded-2xl border overflow-hidden ${isDark ? 'border-white/10 bg-slate-900/50' : 'border-slate-200 bg-white'}`}>
-          <div className={`p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
-            <div className="flex items-center gap-2">
-              <Users size={18} className="text-sky-400" />
-              <h2 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {isAr ? 'قائمة الطلاب' : 'Students List'}
+        <div className={`rounded-3xl border overflow-hidden transition-all duration-300 ${isDark ? 'border-white/5 bg-slate-900/20 shadow-xl' : 'border-slate-200 bg-white shadow-md'}`}>
+          <div className={`p-6 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
+            <div className="flex items-center gap-2.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
+              <h2 className={`font-black text-xl tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                {isAr ? 'قائمة الطلاب المسجلين' : 'Registered Students'}
               </h2>
-              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${isDark ? 'bg-sky-500/20 text-sky-400' : 'bg-sky-100 text-sky-600'}`}>
+              <span className={`px-2.5 py-1 rounded-xl text-xs font-extrabold ${isDark ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>
                 {filtered.length}
               </span>
             </div>
-            <div className={`flex items-center gap-2 rounded-xl px-3 py-2 border ${isDark ? 'border-white/10 bg-slate-800' : 'border-slate-200 bg-slate-50'}`}>
-              <Search size={14} className="text-slate-400" />
+            <div className={`flex items-center gap-2 rounded-2xl px-4 py-2.5 border transition-all ${isDark ? 'border-white/5 bg-slate-900/90 focus-within:border-indigo-500/50' : 'border-slate-200 bg-slate-50 focus-within:border-indigo-500'}`}>
+              <Search size={16} className="text-slate-400" />
               <input
                 type="text"
-                placeholder={isAr ? 'بحث باسم أو بريد إلكتروني...' : 'Search by name or email...'}
+                placeholder={isAr ? 'بحث باسم أو إيميل...' : 'Search name or email...'}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-transparent outline-none text-sm text-slate-300 placeholder-slate-500 w-48"
+                className="bg-transparent outline-none text-sm text-slate-300 placeholder-slate-500 w-52 font-medium"
               />
             </div>
           </div>
@@ -206,60 +226,73 @@ export default function PartnerDashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className={`text-xs uppercase tracking-wider ${isDark ? 'bg-slate-900 text-slate-400 border-b border-white/5' : 'bg-slate-50 text-slate-500 border-b border-slate-100'}`}>
-                  <th className="px-5 py-3 text-start">{isAr ? 'الطالب' : 'Student'}</th>
-                  <th className="px-5 py-3 text-start">{isAr ? 'التحقق' : 'Verified'}</th>
-                  <th className="px-5 py-3 text-start">{isAr ? 'المحفظة' : 'Portfolio'}</th>
-                  <th className="px-5 py-3 text-start">{isAr ? 'تاريخ التسجيل' : 'Registered'}</th>
+                <tr className={`text-xs uppercase tracking-wider font-extrabold ${isDark ? 'bg-slate-900/50 text-slate-400 border-b border-white/5' : 'bg-slate-100/50 text-slate-500 border-b border-slate-200'}`}>
+                  <th className="px-6 py-4 text-start">{isAr ? 'الاسم والطالب' : 'Student Info'}</th>
+                  <th className="px-6 py-4 text-start">{isAr ? 'تأكيد الحساب' : 'Account Status'}</th>
+                  <th className="px-6 py-4 text-start">{isAr ? 'الحقيبة المهنية' : 'Portfolio Link'}</th>
+                  <th className="px-6 py-4 text-start">{isAr ? 'تاريخ الانضمام' : 'Join Date'}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100/5">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-5 py-12 text-center text-slate-500 text-sm">
-                      {isAr ? 'لا يوجد طلاب مرتبطون بمركزكم بعد.' : 'No students linked to your center yet.'}
+                    <td colSpan={4} className="px-6 py-16 text-center text-slate-400 font-medium">
+                      {isAr ? 'لا يوجد طلاب مرتبطون بمركزكم حالياً.' : 'No students found.'}
                     </td>
                   </tr>
                 ) : (
                   filtered.map((student, i) => {
                     const published = student.portfolios.find((p) => p.isPublished);
                     return (
-                      <tr key={student.id} className={`border-b transition-colors ${isDark ? 'border-white/5 hover:bg-white/3' : 'border-slate-100 hover:bg-slate-50'} ${i % 2 === 0 ? '' : isDark ? 'bg-slate-900/30' : 'bg-slate-50/50'}`}>
-                        <td className="px-5 py-3">
-                          <div>
-                            <p className={`font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{student.fullName}</p>
-                            <p className="text-slate-500 text-xs">{student.email}</p>
+                      <tr key={student.id} className={`transition-colors hover:bg-indigo-500/[0.02] ${i % 2 === 0 ? '' : isDark ? 'bg-slate-900/20' : 'bg-slate-50/40'}`}>
+                        <td className="px-6 py-4.5">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${isDark ? 'bg-slate-800 text-indigo-400' : 'bg-slate-100 text-indigo-600'}`}>
+                              {student.fullName.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className={`font-bold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>{student.fullName}</p>
+                              <p className="text-slate-500 text-xs flex items-center gap-1 mt-0.5">
+                                <Mail size={11} />
+                                {student.email}
+                              </p>
+                            </div>
                           </div>
                         </td>
-                        <td className="px-5 py-3">
+                        <td className="px-6 py-4.5">
                           {student.isVerified ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400">
-                              <UserCheck size={11} /> {isAr ? 'مفعل' : 'Active'}
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                              <UserCheck size={12} /> {isAr ? 'مفعل' : 'Active'}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-400">
-                              {isAr ? 'بانتظار التفعيل' : 'Pending'}
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 animate-pulse">
+                              {isAr ? 'قيد التحقق' : 'Pending'}
                             </span>
                           )}
                         </td>
-                        <td className="px-5 py-3">
+                        <td className="px-6 py-4.5">
                           {published ? (
                             <a
                               href={`/p/${published.slug}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-sky-400 hover:underline text-xs font-semibold"
+                              className="inline-flex items-center gap-1.5 text-indigo-500 hover:text-indigo-400 hover:underline text-sm font-bold"
                             >
-                              <Globe size={12} /> {`/p/${published.slug}`} <ExternalLink size={10} />
+                              <Globe size={14} /> {published.slug} <ExternalLink size={12} />
                             </a>
                           ) : student.portfolios.length > 0 ? (
-                            <span className="text-xs text-slate-500">{isAr ? 'مسودة' : 'Draft'}</span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-slate-500/10 text-slate-400 border border-slate-500/10">
+                              {isAr ? 'مسودة' : 'Draft'}
+                            </span>
                           ) : (
-                            <span className="text-xs text-slate-500">—</span>
+                            <span className="text-slate-400 text-xs">—</span>
                           )}
                         </td>
-                        <td className="px-5 py-3 text-slate-400 text-xs">
-                          {new Date(student.registeredAt).toLocaleDateString(isAr ? 'ar-SA' : 'en-GB')}
+                        <td className="px-6 py-4.5 text-slate-400 text-xs font-semibold">
+                          <span className="inline-flex items-center gap-1.5">
+                            <Calendar size={12} />
+                            {new Date(student.registeredAt).toLocaleDateString(isAr ? 'ar-SA' : 'en-GB')}
+                          </span>
                         </td>
                       </tr>
                     );
@@ -271,8 +304,8 @@ export default function PartnerDashboardPage() {
         </div>
 
         {/* Footer */}
-        <footer className={`py-4 text-center text-xs border-t ${isDark ? 'border-white/10 text-slate-600' : 'border-slate-200 text-slate-400'}`}>
-          &copy; {new Date().getFullYear()} People Monitor — {isAr ? 'لوحة تحكم الشريك' : 'Partner Portal'}
+        <footer className={`py-6 text-center text-xs border-t transition-all ${isDark ? 'border-white/5 text-slate-600' : 'border-slate-200 text-slate-400'}`}>
+          &copy; {new Date().getFullYear()} People Monitor &bull; {isAr ? 'منصة إدارة وتتبع الحقائب المهنية' : 'Portfolio Tracking Platform'}
         </footer>
       </div>
     </div>
