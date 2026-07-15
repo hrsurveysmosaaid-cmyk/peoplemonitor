@@ -300,112 +300,127 @@ export default function DashboardPage() {
             </div>
 
             {/* Status + Actions */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
 
-              {/* Save status pill */}
-              {(saveState !== 'idle' || saveLabel) && (
-                <span className={`hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all ${
-                  saveState === 'saving' ? isDark ? 'bg-amber-500/10 text-amber-400' : 'bg-amber-50 text-amber-600'
-                  : saveState === 'saved' ? isDark ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'
-                  : saveState === 'error' ? isDark ? 'bg-red-500/10 text-red-400' : 'bg-red-50 text-red-600'
-                  : isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'
+              {/* Save status pill (Hidden when it's just 'Loaded from database') */}
+              {(saveState !== 'idle' || (saveLabel && saveLabel !== 'Loaded from database')) && (
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all ${
+                  saveState === 'saving' ? isDark ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-200'
+                  : saveState === 'saved' ? isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                  : saveState === 'error' ? isDark ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-red-50 text-red-600 border border-red-200'
+                  : isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-500 border border-slate-200'
                 }`}>
-                  {saveState === 'saving' && <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />}
-                  {saveState === 'saved' && <CheckCircle2 size={12} />}
+                  {saveState === 'saving' && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
+                  {saveState === 'saved' && <CheckCircle2 size={11} />}
                   {saveLabel}
                 </span>
               )}
-
-              {/* Published link */}
-              {portfolioSlug && isPublished && (
-                <a
-                  href={`/p/${portfolioSlug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`hidden md:inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${isDark ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  {portfolioSlug}
-                  <ExternalLink size={11} />
-                </a>
-              )}
-
-              <div className={`hidden sm:block w-px h-5 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
 
               {/* Free guide */}
               <a
                 href="https://t.me/HandbookDownloaded_bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`hidden lg:inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl transition-all ${isDark ? 'bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 ring-1 ring-violet-500/20' : 'bg-violet-50 text-violet-600 hover:bg-violet-100 ring-1 ring-violet-200'}`}
+                className={`hidden lg:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all ${isDark ? 'bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 border border-violet-500/20' : 'bg-violet-50 text-violet-600 hover:bg-violet-100 border border-violet-200'}`}
               >
-                <Sparkles size={13} />
+                <Sparkles size={12} />
                 {t.freeGuideCta}
               </a>
 
-              <div className={`w-px h-5 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+              <div className={`hidden lg:block w-px h-4 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
 
               {/* Save */}
               <button
                 onClick={handleSaveDraft}
                 className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${
                   saveState === 'saving'
-                    ? isDark ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/20' : 'bg-amber-50 text-amber-600'
-                    : isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 ring-1 ring-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 ring-1 ring-slate-200'
+                    ? isDark ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25' : 'bg-amber-50 text-amber-600 border border-amber-200'
+                    : isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
                 }`}
               >
-                <Save size={14} className={saveState === 'saving' ? 'animate-pulse' : ''} />
-                <span className="hidden sm:inline">{lang === 'ar' ? 'حفظ' : 'Save'}</span>
+                <Save size={13} className={saveState === 'saving' ? 'animate-pulse' : ''} />
+                <span>{lang === 'ar' ? 'حفظ' : 'Save'}</span>
               </button>
+
+              {/* Published Link (Shortened, next to Publish) */}
+              {portfolioSlug && isPublished && (
+                <div className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                  <span className="max-w-[80px] sm:max-w-[120px] truncate" title={portfolioSlug}>
+                    {portfolioSlug.length > 12 ? `${portfolioSlug.slice(0, 10)}...` : portfolioSlug}
+                  </span>
+                  <div className="flex items-center gap-1 ml-1 flex-shrink-0">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/p/${portfolioSlug}`);
+                        setSaveLabel(lang === 'ar' ? 'تم نسخ الرابط!' : 'Link copied!');
+                        setTimeout(() => setSaveLabel(''), 2000);
+                      }}
+                      className="hover:scale-110 transition-transform p-0.5"
+                      title={lang === 'ar' ? 'نسخ الرابط' : 'Copy Link'}
+                    >
+                      <Copy size={11} />
+                    </button>
+                    <a
+                      href={`/p/${portfolioSlug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:scale-110 transition-transform p-0.5 text-inherit"
+                    >
+                      <ExternalLink size={11} />
+                    </a>
+                  </div>
+                </div>
+              )}
 
               {/* Publish */}
               <button
                 onClick={() => setShowPublish(true)}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30 hover:-translate-y-px transition-all duration-200 active:scale-95"
               >
-                <UploadCloud size={14} />
-                <span className="hidden sm:inline">{lang === 'ar' ? 'نشر' : 'Publish'}</span>
+                <UploadCloud size={13} />
+                <span>{lang === 'ar' ? 'نشر' : 'Publish'}</span>
               </button>
 
-              {/* Export PDF */}
+              {/* Export */}
               <button
                 onClick={handleExportPDF}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 ring-1 ring-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 ring-1 ring-slate-200'}`}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'}`}
               >
-                <FileDown size={14} />
-                <span className="hidden sm:inline">{lang === 'ar' ? 'تصدير PDF' : 'Export PDF'}</span>
+                <FileDown size={13} />
+                <span>{lang === 'ar' ? 'تصدير' : 'Export'}</span>
               </button>
 
-              <div className={`w-px h-5 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
+              <div className="w-px h-4 bg-white/10" />
 
               {/* Theme */}
               <button
                 onClick={toggleTheme}
-                className={`p-2 rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/5 text-slate-400 hover:text-slate-200' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-700'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border border-slate-200'}`}
                 title={t.themeToggle}
                 aria-label="toggle theme"
               >
-                {isDark ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-indigo-500" />}
+                {isDark ? <Sun size={13} className="text-amber-400" /> : <Moon size={13} className="text-indigo-500" />}
               </button>
 
               {/* Language */}
               <button
                 onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
-                className={`p-2 rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/5 text-slate-400 hover:text-slate-200' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-700'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border border-slate-200'}`}
                 title={t.languageToggle}
                 aria-label="toggle language"
               >
-                <Languages size={15} />
+                <Languages size={13} />
               </button>
 
               {/* Logout */}
               <button
                 onClick={handleLogout}
-                className={`p-2 rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-red-500/10 text-slate-500 hover:text-red-400' : 'hover:bg-red-50 text-slate-400 hover:text-red-500'}`}
+                className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isDark ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20' : 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200'}`}
                 title={t.logout}
                 aria-label={t.logout}
               >
-                <LogOut size={15} />
+                <LogOut size={13} />
               </button>
             </div>
           </div>
