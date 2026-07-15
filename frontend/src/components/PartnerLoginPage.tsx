@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUi } from '../ui/UiContext';
-import { Building2, Moon, Sun, Languages } from 'lucide-react';
+import {
+  Building2, Moon, Sun, Languages, Mail, Lock,
+  ArrowRight, AlertCircle, Sparkles, Shield
+} from 'lucide-react';
 
 export default function PartnerLoginPage() {
   const { theme, toggleTheme, lang, setLang } = useUi();
@@ -40,100 +43,150 @@ export default function PartnerLoginPage() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} px-4 py-12 flex items-center justify-center relative overflow-hidden`}>
-      <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="absolute -bottom-20 -left-16 w-96 h-96 rounded-full bg-sky-500/10 blur-3xl" />
+    <div
+      className={`min-h-screen flex items-center justify-center px-4 py-12 transition-colors duration-500 overflow-hidden relative ${isDark ? 'bg-[#060818] text-slate-100' : 'bg-[#f4f6fb] text-slate-900'}`}
+      dir={isAr ? 'rtl' : 'ltr'}
+    >
+      {/* Ambient orbs */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className={`absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full blur-[110px] opacity-30 ${isDark ? 'bg-indigo-600' : 'bg-indigo-200'}`} />
+        <div className={`absolute -bottom-40 -left-24 w-[400px] h-[400px] rounded-full blur-[100px] opacity-25 ${isDark ? 'bg-sky-600' : 'bg-sky-200'}`} />
+        <div className={`absolute top-1/2 left-1/4 w-[300px] h-[300px] rounded-full blur-[80px] opacity-15 ${isDark ? 'bg-violet-600' : 'bg-violet-100'}`} />
       </div>
 
-      <div className={`auth-card max-w-md w-full p-8 relative z-10 ${isDark ? 'bg-slate-900/60 border-white/10' : 'bg-white/85 border-slate-200'}`}>
-        {/* Brand & Controls */}
-        <div className={`mb-8 flex items-start justify-between gap-3 ${isAr ? 'flex-row-reverse' : ''}`}>
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-xl ${isDark ? 'bg-indigo-500/20' : 'bg-indigo-100'}`}>
-              <Building2 size={22} className="text-indigo-400" />
-            </div>
-            <div>
-              <p className={`font-extrabold text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>People Monitor</p>
-              <p className="text-slate-500 text-xs">{isAr ? 'بوابة المراكز التدريبية' : 'Training Center Portal'}</p>
-            </div>
+      {/* Top-right controls */}
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+        <button
+          onClick={toggleTheme}
+          className={`p-2.5 rounded-xl transition-all duration-200 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 ring-1 ring-white/10' : 'bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 ring-1 ring-slate-200 shadow-sm'}`}
+          aria-label="toggle theme"
+        >
+          {isDark ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-indigo-500" />}
+        </button>
+        <button
+          onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
+          className={`px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all duration-200 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 ring-1 ring-white/10' : 'bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-700 ring-1 ring-slate-200 shadow-sm'}`}
+        >
+          <Languages size={14} />
+          {lang === 'en' ? 'ع' : 'EN'}
+        </button>
+      </div>
+
+      {/* Login Card */}
+      <div className={`relative z-10 w-full max-w-[420px] rounded-3xl border p-8 backdrop-blur-2xl shadow-2xl transition-all duration-300 ${isDark ? 'border-white/[0.07] bg-slate-900/80 shadow-slate-950/80' : 'border-white bg-white/90 shadow-slate-200/60'}`}>
+
+        {/* Brand */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className={`p-3 rounded-2xl ${isDark ? 'bg-indigo-500/15 ring-1 ring-indigo-500/25' : 'bg-indigo-50 ring-1 ring-indigo-200'}`}>
+            <Building2 size={22} className="text-indigo-500" />
           </div>
-          <div className="flex items-center gap-2">
-            <button className="icon-button" onClick={toggleTheme} aria-label="toggle theme">
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-            <button
-              className="icon-button flex items-center gap-1 text-xs font-bold"
-              onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
-            >
-              <Languages size={16} />
-              <span>{lang === 'en' ? 'ع' : 'EN'}</span>
-            </button>
+          <div>
+            <p className={`font-black text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>People Monitor</p>
+            <p className="text-slate-500 text-xs">{isAr ? 'بوابة المراكز التدريبية' : 'Training Center Portal'}</p>
           </div>
         </div>
 
-        <div className="mb-8">
-          <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            {isAr ? 'دخول المركز التدريبي' : 'Training Center Login'}
+        {/* Heading */}
+        <div className="mb-6 space-y-1">
+          <h1 className={`text-2xl font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
+            {isAr ? 'تسجيل دخول المركز' : 'Partner Login'}
           </h1>
-          <p className={`mt-1 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            {isAr ? 'أدخل بيانات حساب مركزكم التدريبي' : 'Enter your training center account credentials'}
+          <p className="text-slate-500 text-sm">
+            {isAr ? 'أدخل بيانات حساب مركزكم التدريبي للوصول للوحة التحكم' : 'Enter your center credentials to access the dashboard'}
           </p>
         </div>
 
+        {/* Error */}
         {error && (
-          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-300 text-sm text-center">
+          <div className="mb-5 flex items-center gap-2.5 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            <AlertCircle size={15} className="flex-shrink-0" />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <label className="block">
-            <span className="text-slate-300 text-sm font-medium">{isAr ? 'البريد الإلكتروني للمسؤول' : 'Admin Email'}</span>
-            <input
-              id="input-partner-email"
-              type="email"
-              required
-              className="input-field mt-2 font-sans"
-              placeholder="center@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-            />
-          </label>
+        {/* Form */}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              {isAr ? 'البريد الإلكتروني' : 'Email Address'}
+            </label>
+            <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-all ${isDark ? 'border-white/[0.07] bg-slate-800/60 focus-within:border-indigo-500/50 focus-within:bg-slate-800' : 'border-slate-200 bg-slate-50 focus-within:border-indigo-400 focus-within:bg-white focus-within:shadow-sm'}`}>
+              <Mail size={15} className="text-slate-500 flex-shrink-0" />
+              <input
+                id="input-partner-email"
+                type="email"
+                required
+                placeholder="center@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                className="flex-1 bg-transparent outline-none text-sm placeholder-slate-500 font-medium"
+              />
+            </div>
+          </div>
 
-          <label className="block">
-            <span className="text-slate-300 text-sm font-medium">{isAr ? 'كلمة المرور' : 'Password'}</span>
-            <input
-              id="input-partner-password"
-              type="password"
-              required
-              className="input-field mt-2"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-            />
-          </label>
+          <div className="space-y-1.5">
+            <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              {isAr ? 'كلمة المرور' : 'Password'}
+            </label>
+            <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 transition-all ${isDark ? 'border-white/[0.07] bg-slate-800/60 focus-within:border-indigo-500/50 focus-within:bg-slate-800' : 'border-slate-200 bg-slate-50 focus-within:border-indigo-400 focus-within:bg-white focus-within:shadow-sm'}`}>
+              <Lock size={15} className="text-slate-500 flex-shrink-0" />
+              <input
+                id="input-partner-password"
+                type="password"
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="flex-1 bg-transparent outline-none text-sm placeholder-slate-500"
+              />
+            </div>
+          </div>
 
           <button
             id="btn-partner-login"
             type="submit"
             disabled={loading}
-            className="button-primary w-full py-3 text-base disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-black bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all duration-200 active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none mt-2"
           >
-            {loading ? (isAr ? 'جارٍ الدخول...' : 'Logging in...') : (isAr ? 'دخول' : 'Login')}
+            {loading ? (
+              <>
+                <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                {isAr ? 'جاري الدخول...' : 'Logging in...'}
+              </>
+            ) : (
+              <>
+                {isAr ? 'دخول إلى اللوحة' : 'Access Dashboard'}
+                <ArrowRight size={15} className={isAr ? 'rotate-180' : ''} />
+              </>
+            )}
           </button>
         </form>
 
-        <div className={`mt-8 pt-5 border-t text-center ${isDark ? 'border-white/10' : 'border-slate-100'}`}>
+        {/* Security note */}
+        <div className={`mt-5 flex items-center gap-2 p-3 rounded-xl ${isDark ? 'bg-slate-800/50' : 'bg-slate-50'}`}>
+          <Shield size={13} className="text-slate-400 flex-shrink-0" />
+          <p className="text-xs text-slate-500">
+            {isAr ? 'اتصال آمن ومشفر — تسجيل الدخول خاص بمسؤولي المراكز التدريبية' : 'Secure encrypted connection — partners only'}
+          </p>
+        </div>
+
+        {/* Divider + nav link */}
+        <div className={`mt-6 pt-5 border-t text-center ${isDark ? 'border-white/[0.06]' : 'border-slate-100'}`}>
           <button
             onClick={() => navigate('/login')}
-            className="text-sky-400 text-sm font-semibold hover:underline"
+            className="text-indigo-500 hover:text-indigo-400 text-sm font-bold hover:underline transition-colors"
           >
             {isAr ? '← دخول المستخدم العادي' : '← Regular User Login'}
           </button>
         </div>
+      </div>
+
+      {/* Bottom branding */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+        <Sparkles size={12} className="text-indigo-500/40" />
+        <span className="text-xs text-slate-600 font-medium">People Monitor &copy; {new Date().getFullYear()}</span>
       </div>
     </div>
   );
