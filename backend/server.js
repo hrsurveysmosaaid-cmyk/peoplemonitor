@@ -815,9 +815,6 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
   </script>
 </body>
 </html>`;
-  </script>
-</body>
-</html>`;
 
 const renderUserWorkstationPage = (user, portfolios) => `<!DOCTYPE html>
 <html lang="ar">
