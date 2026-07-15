@@ -12,7 +12,7 @@ import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import PartnerLoginPage from './components/PartnerLoginPage';
 import PartnerDashboardPage from './components/PartnerDashboardPage';
 
-// Protected Route Guard
+// Protected Route Guard (regular users)
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -26,6 +26,15 @@ const LoginRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
   if (token) {
     return <Navigate to="/dashboard" replace />;
+  }
+  return <>{children}</>;
+};
+
+// Partner Route Guard - protects partner dashboard
+const PartnerRoute = ({ children }: { children: React.ReactNode }) => {
+  const token = localStorage.getItem('partnerToken');
+  if (!token) {
+    return <Navigate to="/partner/login" replace />;
   }
   return <>{children}</>;
 };
@@ -119,9 +128,9 @@ function App() {
         <Route
           path="/partner/dashboard"
           element={
-            localStorage.getItem('partnerToken')
-              ? <PartnerDashboardPage />
-              : <Navigate to="/partner/login" replace />
+            <PartnerRoute>
+              <PartnerDashboardPage />
+            </PartnerRoute>
           }
         />
 
