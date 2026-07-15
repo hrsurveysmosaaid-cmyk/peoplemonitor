@@ -22,19 +22,23 @@ const createPartnersTable = async () => {
   await executeQuery(createTable);
   console.log('✅ Table partners created/verified successfully');
 
-  // Add partner_id to global_users if it does not exist
-  const addColumn = `
-    ALTER TABLE global_users
-    ADD COLUMN IF NOT EXISTS partner_id INT NULL DEFAULT NULL
-  `;
+  // Check if partner_id column already exists before adding it
+  // (ADD COLUMN IF NOT EXISTS requires MySQL 8.0.3+ which may not be available)
   try {
-    await executeQuery(addColumn);
-    console.log('✅ Column partner_id added to global_users');
-  } catch (err) {
-    // Column may already exist in some MySQL versions that don't support IF NOT EXISTS
-    if (!err.message.includes('Duplicate column')) {
-      throw err;
+    const columns = await executeQuery(
+      `SHOW COLUMNS FROM global_users LIKE 'partner_id'`
+    );
+    if (columns.length === 0) {
+      await executeQuery(
+        `ALTER TABLE global_users ADD COLUMN partner_id INT NULL DEFAULT NULL`
+      );
+      console.log('✅ Column partner_id added to global_users');
+    } else {
+      console.log('✅ Column partner_id already exists in global_users');
     }
+  } catch (err) {
+    console.error('❌ Failed to add partner_id column:', err.message);
+    throw err;
   }
 };
 
