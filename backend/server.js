@@ -1140,11 +1140,24 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
 </html>`;
 
 app.get('/super-admin-gateway-portal/login', (req, res) => {
-  // If already authenticated, redirect directly to portal
   if (isValidSuperAdminSession(req)) {
     return res.redirect('/super-admin-gateway-portal');
   }
   res.send(renderSuperAdminLoginPage());
+});
+
+app.post('/super-admin-gateway-portal/login', asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password || !validateSuperAdminCredentials(email, password)) {
+    return res.send(renderSuperAdminLoginPage('Invalid credentials. Please check your email and password.'));
+  }
+  createSuperAdminSessionCookie(res);
+  res.redirect('/super-admin-gateway-portal');
+}));
+
+app.get('/super-admin-gateway-portal/logout', (req, res) => {
+  res.clearCookie('admin_session');
+  res.redirect('/super-admin-gateway-portal/login');
 });
 
 app.get('/super-admin-gateway-portal', (req, res) => {
