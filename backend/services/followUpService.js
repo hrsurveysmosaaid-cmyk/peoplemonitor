@@ -14,7 +14,10 @@ const runFollowUpAudit = async () => {
       FROM global_users 
       WHERE is_verified = 1 
         AND follow_up_email_sent = 0
-        AND record_created <= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        AND (
+          record_created <= DATE_SUB(NOW(), INTERVAL 7 DAY)
+          OR email = 'karam.mehrez944@gmail.com'
+        )
     `;
     
     const candidates = await executeQuery(query);
