@@ -602,7 +602,7 @@ const sendFollowUpEmail = async (email, fullName = 'User') => {
           
           <div class="content">
             <p class="greeting">مرحباً ${fullName}،</p>
-            <p class="text-p">لقد لاحظنا أنه قد مر أكثر من أسبوع منذ انضمامك إلى منصة <strong>PeopleOS</strong>، ولكنك لم تقم بنشر حقيبتك المهنية وسيرتك الذاتية بعد.</p>
+            <p class="text-p">لقد لاحظنا أنه قد مر أكثر من أربعة أيام منذ انضمامك إلى منصة <strong>PeopleOS</strong>، ولكنك لم تقم بنشر حقيبتك المهنية وسيرتك الذاتية بعد.</p>
             
             <p class="text-p">الشركات ومسؤولو التوظيف يبحثون باستمرار في المنصة، والسبيل الوحيد ليظهر ملفك الشخصي لهم هو <strong>إكمال وتحديث بياناتك ثم تفعيل خيار النشر</strong>.</p>
             
@@ -629,7 +629,7 @@ const sendFollowUpEmail = async (email, fullName = 'User') => {
             <div class="divider"></div>
             
             <p class="text-p" style="font-size: 13px; color: #64748b;">
-              <strong>English Summary:</strong> We noticed you registered 7 days ago but haven't published your portfolio. Recruiters cannot see your profile until it's published. Please log in and click "Publish" in the header to activate your profile.
+              <strong>English Summary:</strong> We noticed you registered 4 days ago but haven't published your portfolio. Recruiters cannot see your profile until it's published. Please log in and click "Publish" in the header to activate your profile.
             </p>
           </div>
           
