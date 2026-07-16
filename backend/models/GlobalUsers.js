@@ -16,6 +16,8 @@ const createGlobalUsersTable = async () => {
       otp_token_string VARCHAR(6) NULL,
       otp_expiration TIMESTAMP NULL,
       record_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      partner_id INT NULL,
+      follow_up_email_sent BOOLEAN DEFAULT FALSE,
       INDEX idx_email (email),
       INDEX idx_auth_provider (auth_provider)
     )
@@ -24,6 +26,24 @@ const createGlobalUsersTable = async () => {
   try {
     await executeQuery(query);
     console.log('✅ Table global_users created successfully');
+    
+    // Proactively check and add partner_id and follow_up_email_sent to existing setups
+    try {
+      const columns = await executeQuery('SHOW COLUMNS FROM global_users');
+      const hasPartnerId = columns.some(c => c.Field === 'partner_id');
+      const hasFollowUp = columns.some(c => c.Field === 'follow_up_email_sent');
+      
+      if (!hasPartnerId) {
+        await executeQuery('ALTER TABLE global_users ADD COLUMN partner_id INT NULL');
+        console.log('✅ Column partner_id added dynamically to global_users');
+      }
+      if (!hasFollowUp) {
+        await executeQuery('ALTER TABLE global_users ADD COLUMN follow_up_email_sent BOOLEAN DEFAULT FALSE');
+        console.log('✅ Column follow_up_email_sent added dynamically to global_users');
+      }
+    } catch (e) {
+      console.warn('⚠️ Column alteration check skipped/failed:', e.message);
+    }
   } catch (error) {
     console.error('❌ Error creating global_users table:', error.message);
     throw error;

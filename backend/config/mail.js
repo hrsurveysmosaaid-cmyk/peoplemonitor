@@ -464,9 +464,199 @@ const sendWelcomeEmail = async (email, fullName = 'User') => {
   }
 };
 
+/**
+ * Send automated follow-up email to remind users to complete and publish their portfolios
+ * @param {string} email - Recipient email address
+ * @param {string} fullName - User's full name
+ * @returns {Promise<Object>} Send result
+ */
+const sendFollowUpEmail = async (email, fullName = 'User') => {
+  if (!transporter) {
+    await initializeMailer();
+  }
+
+  const loginUrl = process.env.CORS_ORIGIN || 'https://peopleos.online';
+
+  const mailOptions = {
+    from: `${process.env.SMTP_FROM_NAME || 'PeopleOS'} <${process.env.SMTP_USER}>`,
+    to: email,
+    subject: 'أكمل بيانات حقيبتك المهنية وانشرها للشركات - Complete and Publish Your PeopleOS CV',
+    html: `
+      <!DOCTYPE html>
+      <html lang="ar" dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>أكمل بيانات حقيبتك المهنية</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            direction: rtl;
+          }
+          .wrapper {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+          }
+          .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+          }
+          .header h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 850;
+            letter-spacing: -0.02em;
+          }
+          .content {
+            padding: 40px 30px;
+          }
+          .greeting {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+          }
+          .text-p {
+            font-size: 15px;
+            color: #475569;
+            margin-bottom: 20px;
+          }
+          .steps-box {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            border: 1px solid #e2e8f0;
+          }
+          .steps-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #4f46e5;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            letter-spacing: 0.05em;
+          }
+          .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            color: #334155;
+          }
+          .step-number {
+            width: 24px; height: 24px;
+            background: #4f46e5; color: white;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 12px;
+            flex-shrink: 0;
+          }
+          .btn-container {
+            text-align: center;
+            margin: 32px 0;
+          }
+          .button {
+            display: inline-block;
+            padding: 14px 36px;
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 15px;
+            box-shadow: 0 4px 14px rgba(79,70,229,0.3);
+          }
+          .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 30px 0;
+          }
+          .footer {
+            background: #f8fafc;
+            padding: 24px 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            font-size: 12px;
+            color: #94a3b8;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="wrapper">
+          <div class="header">
+            <h1>🚀 PeopleOS</h1>
+            <p>فرصتك المهنية بانتظارك</p>
+          </div>
+          
+          <div class="content">
+            <p class="greeting">مرحباً ${fullName}،</p>
+            <p class="text-p">لقد لاحظنا أنه قد مر أكثر من أسبوع منذ انضمامك إلى منصة <strong>PeopleOS</strong>، ولكنك لم تقم بنشر حقيبتك المهنية وسيرتك الذاتية بعد.</p>
+            
+            <p class="text-p">الشركات ومسؤولو التوظيف يبحثون باستمرار في المنصة، والسبيل الوحيد ليظهر ملفك الشخصي لهم هو <strong>إكمال وتحديث بياناتك ثم تفعيل خيار النشر</strong>.</p>
+            
+            <div class="steps-box">
+              <div class="steps-title">💡 خطوات بسيطة لإطلاق ملفك:</div>
+              <div class="step-item">
+                <div class="step-number">١</div>
+                <div>ادخل إلى حسابك الشخصي في المنصة.</div>
+              </div>
+              <div class="step-item">
+                <div class="step-number">٢</div>
+                <div>أكمل ملء حقول المسمى الوظيفي، الخبرات، والمهارات.</div>
+              </div>
+              <div class="step-item">
+                <div class="step-number">٣</div>
+                <div>اضغط على زر <strong>"نشر"</strong> في الأعلى لتفعيل الرابط الشخصي ومشاركته.</div>
+              </div>
+            </div>
+            
+            <div class="btn-container">
+              <a href="${loginUrl}" class="button">دخول لوحة التحكم وإكمال الملف ←</a>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <p class="text-p" style="font-size: 13px; color: #64748b;">
+              <strong>English Summary:</strong> We noticed you registered 7 days ago but haven't published your portfolio. Recruiters cannot see your profile until it's published. Please log in and click "Publish" in the header to activate your profile.
+            </p>
+          </div>
+          
+          <div class="footer">
+            <p>© 2026 PeopleOS. جميع الحقوق محفوظة.</p>
+            <p>لقد تلقيت هذا البريد الإلكتروني لأنك مسجل في PeopleOS.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  };
+
+  try {
+    const result = await transporter.sendMail(mailOptions);
+    console.log(`📧 Follow-up email sent to ${email}`);
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    console.error(`❌ Failed to send follow-up email to ${email}:`, error.message);
+    throw new Error(`Failed to send follow-up email: ${error.message}`);
+  }
+};
+
 module.exports = {
   initializeMailer,
   sendOTPEmail,
   sendPasswordResetEmail,
   sendWelcomeEmail,
+  sendFollowUpEmail,
 };

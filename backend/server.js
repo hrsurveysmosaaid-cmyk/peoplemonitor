@@ -19,6 +19,7 @@ const PortfolioExperienceBlocksModel = require('./models/PortfolioExperienceBloc
 const MicroSuccessStoriesModel = require('./models/MicroSuccessStories');
 const ExternalLiveEndorsementsModel = require('./models/ExternalLiveEndorsements');
 const PartnersModel = require('./models/Partners');
+const { initializeFollowUpScheduler } = require('./services/followUpService');
 
 // Initialize Express app
 const app = express();
@@ -1279,6 +1280,9 @@ const startServer = async () => {
       console.log(`📧 Mail Service: Connected to ${process.env.SMTP_HOST}`);
       console.log(`🔐 Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? `Configured (${process.env.GOOGLE_CLIENT_ID.slice(0, 20)}...)` : 'NOT CONFIGURED - set GOOGLE_CLIENT_ID in .env'}`);
       console.log(`\n✅ Ready to accept requests on loopback interface\n`);
+      
+      // Initialize automated email reminders for inactive users
+      initializeFollowUpScheduler();
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
