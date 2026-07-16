@@ -155,7 +155,8 @@ export default function RegisterPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/google';
+    const refParam = partnerSlug ? `?ref=${encodeURIComponent(partnerSlug)}` : '';
+    window.location.href = `/api/auth/google${refParam}`;
   };
 
   return (

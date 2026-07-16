@@ -2,6 +2,7 @@
 const jwt = require('jsonwebtoken');
 const { google } = require('googleapis');
 const GlobalUsersModel = require('../models/GlobalUsers');
+const PartnersModel = require('../models/Partners');
 const { sendWelcomeEmail } = require('../config/mail');
 
 /**
@@ -15,8 +16,8 @@ const oauth2Client = new google.auth.OAuth2(
 
 /**
  * Generate Google OAuth consent screen URL and redirect directly
- * GET /api/auth/google
- * This endpoint is used when the frontend sets window.location.href = '/api/auth/google'
+ * GET /api/auth/google?ref=partner-slug
+ * This endpoint is used when the frontend sets window.location.href = '/api/auth/google?ref=...'
  */
 const getGoogleAuthURL = (req, res) => {
   try {
@@ -25,10 +26,16 @@ const getGoogleAuthURL = (req, res) => {
       'https://www.googleapis.com/auth/userinfo.email',
     ];
 
+    // Read the partner referral slug from query params and encode it into OAuth state
+    const partnerSlug = req.query.ref || '';
+    const statePayload = JSON.stringify({ partnerSlug });
+    const stateEncoded = Buffer.from(statePayload).toString('base64');
+
     const authorizationUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: scopes,
       prompt: 'consent',
+      state: stateEncoded,
     });
 
     // Redirect directly to Google — used when the browser navigates to this endpoint
@@ -46,13 +53,24 @@ const getGoogleAuthURL = (req, res) => {
  */
 const googleCallback = async (req, res, next) => {
   try {
-    const { code } = req.query;
+    const { code, state } = req.query;
 
     if (!code) {
       return res.status(400).json({
         success: false,
         error: 'Authorization code not provided',
       });
+    }
+
+    // Decode partner slug from OAuth state parameter
+    let partnerSlug = '';
+    if (state) {
+      try {
+        const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf-8'));
+        partnerSlug = decoded.partnerSlug || '';
+      } catch (e) {
+        console.warn('⚠️ Failed to decode OAuth state:', e.message);
+      }
     }
 
     // Exchange authorization code for tokens
@@ -74,6 +92,17 @@ const googleCallback = async (req, res, next) => {
     const email = googleUser.email.toLowerCase().trim();
     const fullName = googleUser.name || 'Google User';
 
+    // Resolve partner ID from slug
+    let partnerId = null;
+    if (partnerSlug && typeof partnerSlug === 'string' && partnerSlug.trim()) {
+      try {
+        const partner = await PartnersModel.getPartnerBySlug(partnerSlug.trim());
+        if (partner) partnerId = partner.id;
+      } catch (e) {
+        console.warn('⚠️ Failed to resolve partner slug:', e.message);
+      }
+    }
+
     // Check if user exists
     let user = await GlobalUsersModel.getUserByEmail(email);
 
@@ -91,17 +120,28 @@ const googleCallback = async (req, res, next) => {
         // Update to support both local and google
         // For now, just use existing account
       }
+
+      // If user has no partner_id yet and we have one from referral, update it
+      if (partnerId && !user.partner_id) {
+        try {
+          await GlobalUsersModel.updateUser(user.id, { partnerId });
+          console.log(`✅ Updated existing user ${email} with partner_id=${partnerId}`);
+        } catch (e) {
+          console.warn('⚠️ Failed to update partner_id for existing user:', e.message);
+        }
+      }
     } else {
-      // New user - create account with immediate verification
+      // New user - create account with immediate verification and partner association
       user = await GlobalUsersModel.createUser({
         fullName,
         email,
         passSecureHash: null, // No password for OAuth users
         authProvider: 'google',
         isVerified: true, // Automatically verify Google OAuth users
+        partnerId,
       });
 
-      console.log(`✅ New user created via Google OAuth: ${email}`);
+      console.log(`✅ New user created via Google OAuth: ${email}${partnerId ? ` (partner_id=${partnerId})` : ''}`);
 
       // Send welcome email
       try {
@@ -140,7 +180,7 @@ const googleCallback = async (req, res, next) => {
  */
 const verifyGoogleToken = async (req, res, next) => {
   try {
-    const { idToken } = req.body;
+    const { idToken, partnerSlug } = req.body;
 
     if (!idToken) {
       return res.status(400).json({
@@ -180,6 +220,17 @@ const verifyGoogleToken = async (req, res, next) => {
       }
     }
 
+    // Resolve partner ID from slug
+    let partnerId = null;
+    if (partnerSlug && typeof partnerSlug === 'string' && partnerSlug.trim()) {
+      try {
+        const partner = await PartnersModel.getPartnerBySlug(partnerSlug.trim());
+        if (partner) partnerId = partner.id;
+      } catch (e) {
+        console.warn('⚠️ Failed to resolve partner slug:', e.message);
+      }
+    }
+
     // Check if user exists
     let user = await GlobalUsersModel.getUserByEmail(email);
 
@@ -191,17 +242,27 @@ const verifyGoogleToken = async (req, res, next) => {
           error: 'Account already registered with different auth method',
         });
       }
+
+      // If user has no partner_id yet and we have one from referral, update it
+      if (partnerId && !user.partner_id) {
+        try {
+          await GlobalUsersModel.updateUser(user.id, { partnerId });
+        } catch (e) {
+          console.warn('⚠️ Failed to update partner_id:', e.message);
+        }
+      }
     } else {
-      // New user - create with immediate verification
+      // New user - create with immediate verification and partner association
       user = await GlobalUsersModel.createUser({
         fullName,
         email,
         passSecureHash: null,
         authProvider: 'google',
         isVerified: true, // Auto-verified for Google OAuth
+        partnerId,
       });
 
-      console.log(`✅ New user created via Google OAuth: ${email}`);
+      console.log(`✅ New user created via Google OAuth: ${email}${partnerId ? ` (partner_id=${partnerId})` : ''}`);
 
       // Send welcome email
       try {
@@ -244,3 +305,5 @@ module.exports = {
   googleCallback,
   verifyGoogleToken,
 };
+
+

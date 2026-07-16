@@ -114,6 +114,7 @@ const updateUser = async (id, userData) => {
   if (passSecureHash !== undefined) { setClauses.push('pass_secure_hash = ?'); values.push(passSecureHash); }
   if (authProvider !== undefined) { setClauses.push('auth_provider = ?'); values.push(authProvider); }
   if (isVerified !== undefined) { setClauses.push('is_verified = ?'); values.push(isVerified); }
+  if (userData.partnerId !== undefined) { setClauses.push('partner_id = ?'); values.push(userData.partnerId); }
   // OTP fields: always include if key is present (allows explicit NULL to clear them)
   if ('otpTokenString' in userData) { setClauses.push('otp_token_string = ?'); values.push(otpTokenString ?? null); }
   if ('otpExpiration' in userData) { setClauses.push('otp_expiration = ?'); values.push(otpExpiration ?? null); }

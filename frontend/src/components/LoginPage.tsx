@@ -194,8 +194,10 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    // Redirect to backend Google OAuth initiation endpoint
-    window.location.href = '/api/auth/google';
+    // Redirect to backend Google OAuth initiation endpoint with partner slug if it exists
+    const partnerSlug = sessionStorage.getItem('partnerRef') || '';
+    const refParam = partnerSlug ? `?ref=${encodeURIComponent(partnerSlug)}` : '';
+    window.location.href = `/api/auth/google${refParam}`;
   };
 
   return (
