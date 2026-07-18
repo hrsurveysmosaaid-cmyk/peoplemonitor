@@ -707,6 +707,12 @@ router.post('/admin/users/:userId/deep-portal', validateSuperAdminSession(), asy
  */
 router.delete('/admin/users/:userId', validateSuperAdminSession(), asyncHandler(adminController.deleteUser));
 
+/**
+ * Send manual CV-completion reminder email to a user
+ * POST /api/admin/users/:userId/send-reminder
+ */
+router.post('/admin/users/:userId/send-reminder', validateSuperAdminSession(), asyncHandler(adminController.sendReminderEmail));
+
 // ============================================
 // Admin — Partner / Center Management
 // ============================================

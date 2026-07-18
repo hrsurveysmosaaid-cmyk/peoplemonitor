@@ -525,6 +525,26 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
     .btn-bridge:hover { background: rgba(99,102,241,0.22); }
     .btn-del { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.18); }
     .btn-del:hover { background: rgba(239,68,68,0.16); }
+    .btn-reminder { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.22); }
+    .btn-reminder:hover { background: rgba(245,158,11,0.2); }
+    .btn-reminder.sending { opacity: 0.6; pointer-events: none; }
+    .btn-reminder.sent { background: rgba(16,185,129,0.1); color: var(--emerald); border-color: rgba(16,185,129,0.2); }
+
+    /* CV Completion bar */
+    .completion-wrap { display: flex; align-items: center; gap: 7px; min-width: 100px; }
+    .completion-bar-bg {
+      flex: 1; height: 5px; border-radius: 99px;
+      background: rgba(255,255,255,0.07); overflow: hidden;
+    }
+    .light .completion-bar-bg { background: rgba(0,0,0,0.08); }
+    .completion-bar-fill {
+      height: 100%; border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+    .completion-pct {
+      font-size: 11px; font-weight: 700; white-space: nowrap;
+      min-width: 32px; text-align: right;
+    }
 
     /* Partner form */
     .form-card {
@@ -819,6 +839,7 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       statUsers:'إجمالي المستخدمين', statVerified:'حسابات موثقة',
       statPublished:'سير منشورة', statPartners:'مراكز تدريبية',
       indep:'مستقل', searchPh:'بحث بالاسم أو البريد...',
+      colCompletion:'الإكمال', remind:'تذكير', reminderSent:'أُرسل',
     },
     en: {
       title:'Super Admin Gateway', subtitle:'Enterprise Control Hub',
@@ -838,6 +859,7 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
       statUsers:'Total Users', statVerified:'Verified Accounts',
       statPublished:'Published CVs', statPartners:'Training Centers',
       indep:'Independent', searchPh:'Search name or email...',
+      colCompletion:'Completion', remind:'Remind', reminderSent:'Sent',
     }
   };
 
@@ -944,6 +966,14 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         ? '<span class="badge badge-indigo">🏫 ' + u.partnerName + '</span>'
         : '<span style="color:var(--text3);font-size:12px">' + t.indep + '</span>';
 
+      // CV Completion progress bar
+      const pct = typeof u.completion === 'number' ? u.completion : 0;
+      const pctColor = pct >= 80 ? 'var(--emerald)' : pct >= 40 ? 'var(--amber)' : '#ef4444';
+      const completionHtml = '<div class="completion-wrap">' +
+        '<div class="completion-bar-bg"><div class="completion-bar-fill" style="width:' + pct + '%;background:' + pctColor + ';"></div></div>' +
+        '<span class="completion-pct" style="color:' + pctColor + '">' + pct + '%</span>' +
+      '</div>';
+
       const portfolioHtml = !u.portfolios || !u.portfolios.length
         ? '<span style="color:var(--text3);font-size:12px">—</span>'
         : u.portfolios.map(p => {
@@ -965,11 +995,16 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         '<td><span style="font-size:12px;color:var(--text2)">' + (u.jobTitle||'—') + '</span></td>' +
         '<td>' + partnerBadge + '</td>' +
         '<td>' + statusBadge + '</td>' +
+        '<td>' + completionHtml + '</td>' +
         '<td>' + portfolioHtml + '</td>' +
         '<td><div class="actions-cell">' +
           '<button class="btn-action btn-bridge" data-bridge-id="' + u.id + '">' +
             '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>' +
             t.bridge +
+          '</button>' +
+          '<button class="btn-action btn-reminder" data-remind-id="' + u.id + '" title="إرسال تذكير بالبريد">' +
+            '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>' +
+            (t.remind || 'تذكير') +
           '</button>' +
           '<button class="btn-action btn-del" data-delete-id="' + u.id + '">' +
             '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>' +
@@ -986,6 +1021,7 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
         '<th>' + t.colJob + '</th>' +
         '<th>' + t.colCenter + '</th>' +
         '<th>' + t.colStatus + '</th>' +
+        '<th>' + (t.colCompletion || 'الإكمال') + '</th>' +
         '<th>' + t.colPortfolio + '</th>' +
         '<th>' + t.colActions + '</th>' +
       '</tr></thead><tbody>' + rows + '</tbody></table>';
@@ -1002,6 +1038,26 @@ const renderSuperAdminPortalPage = () => `<!DOCTYPE html>
     });
     document.querySelectorAll('[data-delete-id]').forEach(btn => {
       btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-delete-id')));
+    });
+    document.querySelectorAll('[data-remind-id]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-remind-id');
+        btn.classList.add('sending');
+        btn.textContent = '...';
+        try {
+          const r = await fetch('/api/admin/users/' + id + '/send-reminder', { method: 'POST' });
+          const d = await r.json();
+          if (d.success) {
+            btn.classList.remove('sending'); btn.classList.add('sent');
+            btn.textContent = '✓ ' + (T[lang].reminderSent || 'أُرسل');
+            $('statusText').textContent = d.message || 'تم الإرسال ✓';
+            setTimeout(() => { btn.classList.remove('sent'); btn.innerHTML = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>' + (T[lang].remind || 'تذكير'); }, 3000);
+          } else {
+            btn.classList.remove('sending'); btn.textContent = T[lang].remind || 'تذكير';
+            $('statusText').textContent = d.error || 'فشل الإرسال';
+          }
+        } catch { btn.classList.remove('sending'); btn.textContent = T[lang].remind || 'تذكير'; }
+      });
     });
   };
 
