@@ -605,7 +605,7 @@ router.post('/endorsements/send-request', authenticate(), asyncHandler(async (re
  */
 router.post('/endorsements/submit/:token', asyncHandler(async (req, res) => {
   const { token } = req.params;
-  const { endorserName, endorserEmail, endorserTitleRole, endorsementBodyText, signatureVectorStream } = req.body;
+  const { endorserName, endorserEmail, endorserTitleRole, endorsementBodyText, signatureVectorStream, audioFileRef } = req.body;
 
   if (!endorserName || !endorserEmail || !endorserTitleRole || !endorsementBodyText || !signatureVectorStream) {
     return res.status(400).json({ success: false, error: 'Missing required endorsement submission fields' });
@@ -621,7 +621,8 @@ router.post('/endorsements/submit/:token', asyncHandler(async (req, res) => {
     endorserEmail,
     endorserTitleRole,
     endorsementBodyText,
-    signatureVectorStream
+    signatureVectorStream,
+    audioFileRef
   });
 
   return res.json({ success: true, message: 'Endorsement submitted and saved successfully' });

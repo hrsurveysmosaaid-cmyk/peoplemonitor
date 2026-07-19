@@ -214,6 +214,21 @@ export default function PublicPortfolioPageV2() {
     return /^https?:\/\//i.test(u) ? u : `https://${u}`;
   };
 
+  // Convert YouTube / Vimeo / Google Drive links to embeddable iFrame URLs
+  const getEmbedUrl = (url: string): string | null => {
+    if (!url) return null;
+    // YouTube: watch?v=ID or youtu.be/ID
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&showinfo=0`;
+    // Vimeo: vimeo.com/ID
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    // Google Drive: /file/d/ID/
+    const driveMatch = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
+    if (driveMatch) return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+    return null;
+  };
+
   const openDocFromUrl = async (url: string, title?: string) => {
     const lower = url.toLowerCase();
     if (!lower.startsWith('http://') && !lower.startsWith('https://')) {
@@ -364,6 +379,28 @@ export default function PublicPortfolioPageV2() {
     </section>
   );
 
+  // Video Pitch player — shown right below profile card if a video URL is configured
+  const videoPitchUrl: string = (personal as any).videoPitchUrl || '';
+  const embedUrl = videoPitchUrl ? getEmbedUrl(videoPitchUrl) : null;
+  const VideoPitchSection = embedUrl ? (
+    <section className="glass-card rounded-3xl overflow-hidden">
+      <div className={`px-6 pt-5 pb-3 flex items-center gap-2 border-b border-white/10`}>
+        <span className="text-lg">🎬</span>
+        <h2 className="text-lg font-bold">{lang === 'ar' ? 'الفيديو التعريفي' : 'Video Introduction'}</h2>
+      </div>
+      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+        <iframe
+          src={embedUrl}
+          className="absolute inset-0 w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title="Video Pitch"
+          loading="lazy"
+        />
+      </div>
+    </section>
+  ) : null;
+
   const SummarySection = portfolio.professional_summary ? (
     <section className="glass-card p-6 rounded-3xl">
       <h2 className={`text-2xl font-bold mb-4 ${lang==='ar' ? 'border-r-4 pr-3' : 'border-l-4 pl-3'}`}>{t.summary}</h2>
@@ -428,7 +465,8 @@ export default function PublicPortfolioPageV2() {
               );
             })()}
 
-            {(block.attached_asset_url || block.successStory || (endorsementsByExpId[String(block.id)] && endorsementsByExpId[String(block.id)].endorsement_body_text)) && (
+
+            {(block.attached_asset_url || block.successStory || endorsementsByExpId[String(block.id)]?.endorsement_body_text) && (
               <div className="pt-2 text-sm flex flex-wrap items-center gap-2">
                 {block.attached_asset_url && (
                   <button onClick={() => openDocFromUrl(block.attached_asset_url, lang==='ar'?'الوثيقة':'Document')} className="underline font-medium">
@@ -443,7 +481,7 @@ export default function PublicPortfolioPageV2() {
                     </button>
                   </>
                 )}
-                {(endorsementsByExpId[String(block.id)] && endorsementsByExpId[String(block.id)].endorsement_body_text) && (
+                {endorsementsByExpId[String(block.id)]?.endorsement_body_text && (
                   <>
                     {(block.attached_asset_url || block.successStory) && <span className="opacity-60">•</span>}
                     <button onClick={() => openTextModal(endorsementsByExpId[String(block.id)].endorsement_body_text, lang==='ar'?'رسالة التوصية':'Recommendation')} className="underline font-medium">
@@ -451,6 +489,16 @@ export default function PublicPortfolioPageV2() {
                     </button>
                   </>
                 )}
+              </div>
+            )}
+
+            {/* Audio endorsement player */}
+            {endorsementsByExpId[String(block.id)]?.audio_file_ref && (
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <p className="text-xs font-semibold opacity-70 mb-2">{lang === 'ar' ? '🎙 رسالة صوتية من المُوصي' : '🎙 Voice message from endorser'}</p>
+                <audio controls className="w-full max-w-xs" style={{ height: '32px' }}>
+                  <source src={`/api/assets/signed?ref=${encodeURIComponent(endorsementsByExpId[String(block.id)].audio_file_ref)}&slug=${encodeURIComponent(slug || '')}`} />
+                </audio>
               </div>
             )}
           </div>
@@ -666,6 +714,7 @@ export default function PublicPortfolioPageV2() {
         <div className="w-full max-w-none space-y-6">
           {/* Persistent professional header with profile & contacts */}
           {ProfileCard}
+          {VideoPitchSection}
 
           {/* Tabs bar */}
           <div className="glass-inner-card rounded-2xl px-2 py-2 flex flex-wrap items-center gap-2">
@@ -692,6 +741,7 @@ export default function PublicPortfolioPageV2() {
     <div className={`min-h-screen px-3 py-10 sm:px-4 md:px-8 lg:px-12 font-sans select-none ${themeClass}`} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="w-full max-w-none space-y-8">
         {ProfileCard}
+        {VideoPitchSection}
         {SummarySection}
         {ExperiencesSection}
         {EducationSection}

@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Languages, Moon, Sun, Save, UploadCloud,
   FileDown, LogOut, CheckCircle2, Globe, Sparkles,
-  ExternalLink, X, Copy, Zap, PenLine, Cpu
+  ExternalLink, X, Copy, Zap, PenLine, Cpu, LayoutTemplate, Eye
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import { PublishModal } from './PublishModal';
@@ -63,6 +63,8 @@ export default function DashboardPage() {
   const [publishSuccessUrl, setPublishSuccessUrl] = useState<string>('');
   const [showPublishSuccess, setShowPublishSuccess] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewKey, setPreviewKey] = useState(0); // forces iframe refresh
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -382,6 +384,20 @@ export default function DashboardPage() {
                 <span>{lang === 'ar' ? 'نشر' : 'Publish'}</span>
               </button>
 
+              {/* Preview Toggle */}
+              <button
+                onClick={() => { setShowPreview(p => !p); setPreviewKey(k => k + 1); }}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${
+                  showPreview
+                    ? isDark ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-sky-100 text-sky-700 border border-sky-300'
+                    : isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
+                }`}
+                title={showPreview ? (lang === 'ar' ? 'إخفاء المعاينة' : 'Hide preview') : (lang === 'ar' ? 'معاينة حية' : 'Live preview')}
+              >
+                {showPreview ? <LayoutTemplate size={13} /> : <Eye size={13} />}
+                <span className="hidden sm:inline">{showPreview ? (lang === 'ar' ? 'إخفاء' : 'Hide') : (lang === 'ar' ? 'معاينة' : 'Preview')}</span>
+              </button>
+
               {/* Export */}
               <button
                 onClick={handleExportPDF}
@@ -470,76 +486,162 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* ── MAIN CONTENT SECTIONS ── */}
-        <main id="cv-content-workstation" className="grid gap-5 pb-10">
-          <SectionA
-            t={t}
-            personal={workstationData.personal}
-            onChange={(personal) => {
-              setWorkstationData((prev: WorkstationData) => {
-                const next = { ...prev, personal };
-                localStorage.setItem('local_backup', JSON.stringify(next));
-                return next;
-              });
-            }}
-          />
-          <SectionB
-            t={t}
-            summary={workstationData.summary}
-            onChange={(summary) => {
-              setWorkstationData((prev: WorkstationData) => {
-                const next = { ...prev, summary };
-                localStorage.setItem('local_backup', JSON.stringify(next));
-                return next;
-              });
-            }}
-          />
-          <SectionC
-            t={t}
-            personal={workstationData.personal}
-            experiences={workstationData.experiences}
-            onChange={(experiences) => {
-              setWorkstationData((prev: WorkstationData) => {
-                const next = { ...prev, experiences };
-                localStorage.setItem('local_backup', JSON.stringify(next));
-                return next;
-              });
-            }}
-          />
-          <SectionD
-            t={t}
-            education={workstationData.education}
-            onChange={(education) => {
-              setWorkstationData((prev: WorkstationData) => {
-                const next = { ...prev, education };
-                localStorage.setItem('local_backup', JSON.stringify(next));
-                return next;
-              });
-            }}
-          />
-          <SectionE
-            t={t}
-            skills={workstationData.skills}
-            onChange={(skills) => {
-              setWorkstationData((prev: WorkstationData) => {
-                const next = { ...prev, skills };
-                localStorage.setItem('local_backup', JSON.stringify(next));
-                return next;
-              });
-            }}
-          />
-          <SectionF
-            t={t}
-            items={workstationData.dynamicItems}
-            onChange={(dynamicItems) => {
-              setWorkstationData((prev: WorkstationData) => {
-                const next = { ...prev, dynamicItems };
-                localStorage.setItem('local_backup', JSON.stringify(next));
-                return next;
-              });
-            }}
-          />
-        </main>
+        {/* ── MAIN CONTENT AREA (Form + optional Live Preview) ── */}
+        <div className={`flex gap-5 pb-10 transition-all duration-300 ${showPreview ? 'lg:flex-row items-start' : ''}`}>
+
+          {/* Form Column */}
+          <main
+            id="cv-content-workstation"
+            className={`grid gap-5 flex-1 min-w-0 transition-all duration-300 ${showPreview ? 'lg:max-w-[55%]' : ''}`}
+          >
+            <SectionA
+              t={t}
+              personal={workstationData.personal}
+              onChange={(personal) => {
+                setWorkstationData((prev: WorkstationData) => {
+                  const next = { ...prev, personal };
+                  localStorage.setItem('local_backup', JSON.stringify(next));
+                  return next;
+                });
+              }}
+            />
+            <SectionB
+              t={t}
+              summary={workstationData.summary}
+              onChange={(summary) => {
+                setWorkstationData((prev: WorkstationData) => {
+                  const next = { ...prev, summary };
+                  localStorage.setItem('local_backup', JSON.stringify(next));
+                  return next;
+                });
+              }}
+            />
+            <SectionC
+              t={t}
+              personal={workstationData.personal}
+              experiences={workstationData.experiences}
+              onChange={(experiences) => {
+                setWorkstationData((prev: WorkstationData) => {
+                  const next = { ...prev, experiences };
+                  localStorage.setItem('local_backup', JSON.stringify(next));
+                  return next;
+                });
+              }}
+            />
+            <SectionD
+              t={t}
+              education={workstationData.education}
+              onChange={(education) => {
+                setWorkstationData((prev: WorkstationData) => {
+                  const next = { ...prev, education };
+                  localStorage.setItem('local_backup', JSON.stringify(next));
+                  return next;
+                });
+              }}
+            />
+            <SectionE
+              t={t}
+              skills={workstationData.skills}
+              onChange={(skills) => {
+                setWorkstationData((prev: WorkstationData) => {
+                  const next = { ...prev, skills };
+                  localStorage.setItem('local_backup', JSON.stringify(next));
+                  return next;
+                });
+              }}
+            />
+            <SectionF
+              t={t}
+              items={workstationData.dynamicItems}
+              onChange={(dynamicItems) => {
+                setWorkstationData((prev: WorkstationData) => {
+                  const next = { ...prev, dynamicItems };
+                  localStorage.setItem('local_backup', JSON.stringify(next));
+                  return next;
+                });
+              }}
+            />
+          </main>
+
+          {/* Live Preview Pane (only visible when showPreview is true, only on large screens) */}
+          {showPreview && portfolioSlug && (
+            <aside className="hidden lg:flex flex-col gap-3 flex-1 min-w-0 sticky top-24" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+              <div className={`flex items-center justify-between px-4 py-2.5 rounded-2xl border text-xs font-bold ${
+                isDark ? 'bg-white/5 border-white/10 text-slate-400' : 'bg-white border-slate-200 text-slate-500'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>{lang === 'ar' ? 'معاينة مباشرة' : 'Live Preview'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPreviewKey(k => k + 1)}
+                    className="opacity-60 hover:opacity-100 transition-opacity"
+                    title={lang === 'ar' ? 'تحديث' : 'Refresh'}
+                  >
+                    ↻
+                  </button>
+                  <a
+                    href={`/p/${portfolioSlug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="opacity-60 hover:opacity-100 transition-opacity"
+                    title={lang === 'ar' ? 'فتح في تبويب جديد' : 'Open in new tab'}
+                  >
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
+              </div>
+              <div className={`flex-1 rounded-3xl overflow-hidden border shadow-xl ${
+                isDark ? 'border-white/10 shadow-black/40' : 'border-slate-200 shadow-slate-200'
+              }`}>
+                <iframe
+                  key={previewKey}
+                  src={`/p/${portfolioSlug}`}
+                  className="w-full h-full"
+                  style={{ minHeight: 'calc(100vh - 180px)' }}
+                  title="Live Portfolio Preview"
+                  loading="lazy"
+                />
+              </div>
+            </aside>
+          )}
+
+          {/* Mobile preview notice: show a link when preview is toggled on mobile */}
+          {showPreview && portfolioSlug && (
+            <div className={`lg:hidden fixed bottom-6 inset-x-4 z-50 flex items-center justify-between gap-3 px-5 py-3.5 rounded-2xl shadow-2xl border backdrop-blur-xl ${
+              isDark ? 'bg-slate-900/90 border-white/15 text-white' : 'bg-white/95 border-slate-200 text-slate-900'
+            }`}>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                <span className="text-xs font-semibold truncate">{lang === 'ar' ? 'البورتفوليو منشور' : 'Portfolio live'}</span>
+              </div>
+              <a
+                href={`/p/${portfolioSlug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs font-bold text-sky-500 flex-shrink-0"
+              >
+                <Eye size={12} />
+                {lang === 'ar' ? 'عرض' : 'View'}
+              </a>
+              <button onClick={() => setShowPreview(false)} className="p-1 opacity-50 hover:opacity-100 flex-shrink-0">
+                <X size={13} />
+              </button>
+            </div>
+          )}
+
+          {/* Preview hint when no slug yet */}
+          {showPreview && !portfolioSlug && (
+            <aside className="hidden lg:flex items-center justify-center flex-1 min-w-0 rounded-3xl border border-dashed min-h-[300px] ${
+              isDark ? 'border-white/10 text-slate-600' : 'border-slate-300 text-slate-400'
+            }">
+              <p className="text-sm text-center px-6">
+                {lang === 'ar' ? 'احفظ أو انشر ملفك أولاً لتظهر المعاينة هنا' : 'Save or publish your portfolio first to see the live preview here.'}
+              </p>
+            </aside>
+          )}
+        </div>
 
         {/* Footer */}
         <footer className={`py-5 flex flex-col sm:flex-row items-center justify-between gap-2 border-t text-xs transition-all ${isDark ? 'border-white/[0.05] text-slate-600' : 'border-slate-200 text-slate-400'}`}>

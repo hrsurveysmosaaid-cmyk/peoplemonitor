@@ -19,6 +19,7 @@ const createExternalLiveEndorsementsTable = async () => {
       endorser_title_role VARCHAR(255) NULL,
       endorsement_body_text TEXT NULL,
       signature_vector_stream TEXT NULL,
+      audio_file_ref VARCHAR(255) NULL,
       token_auth_string VARCHAR(64) UNIQUE NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -33,6 +34,11 @@ const createExternalLiveEndorsementsTable = async () => {
 
   try {
     await executeQuery(createQuery);
+    try {
+      await executeQuery(`ALTER TABLE external_live_endorsements ADD COLUMN audio_file_ref VARCHAR(255) NULL AFTER signature_vector_stream`);
+    } catch (colErr) {
+      // Ignored: Column might already exist
+    }
     await executeQuery(`ALTER TABLE external_live_endorsements MODIFY portfolio_id INT NULL`);
     await executeQuery(`ALTER TABLE external_live_endorsements MODIFY experience_block_id INT NULL`);
     console.log('✅ Table external_live_endorsements created or updated successfully');
@@ -150,6 +156,7 @@ const updateEndorsementByToken = async (tokenAuthString, endorsementData) => {
     endorserTitleRole,
     endorsementBodyText,
     signatureVectorStream,
+    audioFileRef,
   } = endorsementData;
 
   const query = `
@@ -159,6 +166,7 @@ const updateEndorsementByToken = async (tokenAuthString, endorsementData) => {
       endorser_title_role = COALESCE(?, endorser_title_role),
       endorsement_body_text = COALESCE(?, endorsement_body_text),
       signature_vector_stream = COALESCE(?, signature_vector_stream),
+      audio_file_ref = COALESCE(?, audio_file_ref),
       updated_at = CURRENT_TIMESTAMP
     WHERE token_auth_string = ?
   `;
@@ -170,6 +178,7 @@ const updateEndorsementByToken = async (tokenAuthString, endorsementData) => {
       endorserTitleRole,
       endorsementBodyText,
       signatureVectorStream,
+      audioFileRef,
       tokenAuthString,
     ]);
   } catch (error) {

@@ -99,6 +99,7 @@ const submitEndorsement = async (req, res, next) => {
       endorserTitleRole,
       endorsementBodyText,
       signatureVectorStream,
+      audioFileRef,
     } = req.body;
 
     if (!token || !endorserName || !endorserEmail || !endorserTitleRole || !endorsementBodyText || !signatureVectorStream) {
@@ -119,6 +120,7 @@ const submitEndorsement = async (req, res, next) => {
       endorserTitleRole,
       endorsementBodyText,
       signatureVectorStream,
+      audioFileRef,
       submittedAt: new Date(),
     });
 

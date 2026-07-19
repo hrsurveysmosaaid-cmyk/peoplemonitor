@@ -294,15 +294,24 @@ function SectionA({ t, personal, onChange }: Props) {
           />
         </label>
 
-                <label className="block">
-                    <span className="text-slate-300">{(t as any).behance || 'Behance'} <span className="text-slate-500 text-xs">({t.optional || 'Optional'})</span></span>
+        <label className="block">
+          <span className="text-slate-300">{(t as any).behance || 'Behance'} <span className="text-slate-500 text-xs">({t.optional || 'Optional'})</span></span>
           <input
             className="input-field mt-2"
             value={personal.behance}
             onChange={(e) => onChange({ ...personal, behance: e.target.value })}
             placeholder={(t as any).behancePlaceholder || 'Behance profile link'}
           />
+        </label>
 
+        <label className="block lg:col-span-3">
+          <span className="text-slate-300">{(t as any).videoPitchUrlLabel || 'فيديو تعريفي (Video Pitch Link)'} <span className="text-slate-500 text-xs">({t.optional || 'Optional'})</span></span>
+          <input
+            className="input-field mt-2"
+            value={personal.videoPitchUrl || ''}
+            onChange={(e) => onChange({ ...personal, videoPitchUrl: e.target.value })}
+            placeholder={(t as any).videoPitchUrlPlaceholder || 'YouTube / Drive / Vimeo URL (e.g. https://www.youtube.com/watch?v=...)'}
+          />
         </label>
 
         {/* Languages */}

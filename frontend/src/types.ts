@@ -21,6 +21,7 @@ export type PersonalDetails = {
   behance: string;
   availability?: '' | 'open' | 'freelance' | 'consulting';
   languages?: LanguageEntry[];
+  videoPitchUrl?: string;
 };
 
 
