@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import { PublishModal } from './PublishModal';
+import CareerAssistantPage from './CareerAssistantPage';
 import type { PublishSettings } from '../types';
 
 
@@ -318,7 +319,7 @@ export default function DashboardPage() {
                 onClick={() => setActiveNavTab('ats')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeNavTab === 'ats' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
               >
-                {lang === 'ar' ? 'فحص ATS' : 'ATS Checker'}
+                {lang === 'ar' ? 'المساعد المهني (AI Assistant)' : 'Career Assistant'}
               </button>
               <button
                 onClick={() => setActiveNavTab('settings')}
@@ -536,73 +537,97 @@ export default function DashboardPage() {
                 )}
               </div>
             </section>
-            <SectionA
-              t={t}
-              personal={workstationData.personal}
-              onChange={(personal) => {
-                setWorkstationData((prev: WorkstationData) => {
-                  const next = { ...prev, personal };
-                  localStorage.setItem('local_backup', JSON.stringify(next));
-                  return next;
-                });
-              }}
-            />
-            <SectionB
-              t={t}
-              summary={workstationData.summary}
-              onChange={(summary) => {
-                setWorkstationData((prev: WorkstationData) => {
-                  const next = { ...prev, summary };
-                  localStorage.setItem('local_backup', JSON.stringify(next));
-                  return next;
-                });
-              }}
-            />
-            <SectionC
-              t={t}
-              personal={workstationData.personal}
-              experiences={workstationData.experiences}
-              onChange={(experiences) => {
-                setWorkstationData((prev: WorkstationData) => {
-                  const next = { ...prev, experiences };
-                  localStorage.setItem('local_backup', JSON.stringify(next));
-                  return next;
-                });
-              }}
-            />
-            <SectionD
-              t={t}
-              education={workstationData.education}
-              onChange={(education) => {
-                setWorkstationData((prev: WorkstationData) => {
-                  const next = { ...prev, education };
-                  localStorage.setItem('local_backup', JSON.stringify(next));
-                  return next;
-                });
-              }}
-            />
-            <SectionE
-              t={t}
-              skills={workstationData.skills}
-              onChange={(skills) => {
-                setWorkstationData((prev: WorkstationData) => {
-                  const next = { ...prev, skills };
-                  localStorage.setItem('local_backup', JSON.stringify(next));
-                  return next;
-                });
-              }}
-            />
-            <SectionF
-              t={t}
-              items={workstationData.dynamicItems}
-              onChange={(dynamicItems) => {
-                setWorkstationData((prev: WorkstationData) => {
-                  const next = { ...prev, dynamicItems };
-                  localStorage.setItem('local_backup', JSON.stringify(next));
-                  return next;
-                });
-              }}
-            />
+
+            {/* CONDITIONAL TAB CONTENT */}
+            {activeNavTab === 'profile' && (
+              <>
+                <SectionA
+                  t={t}
+                  personal={workstationData.personal}
+                  onChange={(personal) => {
+                    setWorkstationData((prev: WorkstationData) => {
+                      const next = { ...prev, personal };
+                      localStorage.setItem('local_backup', JSON.stringify(next));
+                      return next;
+                    });
+                  }}
+                />
+                <SectionB
+                  t={t}
+                  summary={workstationData.summary}
+                  onChange={(summary) => {
+                    setWorkstationData((prev: WorkstationData) => {
+                      const next = { ...prev, summary };
+                      localStorage.setItem('local_backup', JSON.stringify(next));
+                      return next;
+                    });
+                  }}
+                />
+                <SectionC
+                  t={t}
+                  personal={workstationData.personal}
+                  experiences={workstationData.experiences}
+                  onChange={(experiences) => {
+                    setWorkstationData((prev: WorkstationData) => {
+                      const next = { ...prev, experiences };
+                      localStorage.setItem('local_backup', JSON.stringify(next));
+                      return next;
+                    });
+                  }}
+                />
+                <SectionD
+                  t={t}
+                  education={workstationData.education}
+                  onChange={(education) => {
+                    setWorkstationData((prev: WorkstationData) => {
+                      const next = { ...prev, education };
+                      localStorage.setItem('local_backup', JSON.stringify(next));
+                      return next;
+                    });
+                  }}
+                />
+                <SectionE
+                  t={t}
+                  skills={workstationData.skills}
+                  onChange={(skills) => {
+                    setWorkstationData((prev: WorkstationData) => {
+                      const next = { ...prev, skills };
+                      localStorage.setItem('local_backup', JSON.stringify(next));
+                      return next;
+                    });
+                  }}
+                />
+                <SectionF
+                  t={t}
+                  items={workstationData.dynamicItems}
+                  onChange={(dynamicItems) => {
+                    setWorkstationData((prev: WorkstationData) => {
+                      const next = { ...prev, dynamicItems };
+                      localStorage.setItem('local_backup', JSON.stringify(next));
+                      return next;
+                    });
+                  }}
+                />
+              </>
+            )}
+
+            {activeNavTab === 'ats' && (
+              <CareerAssistantPage />
+            )}
+
+            {activeNavTab === 'settings' && (
+              <div className={`p-8 rounded-3xl border text-center space-y-3 ${isDark ? 'border-white/10 bg-slate-900/40' : 'border-slate-200 bg-white'}`}>
+                <h3 className="text-lg font-bold">{lang === 'ar' ? 'إعدادات الحساب والحقيبة' : 'Account & Portfolio Settings'}</h3>
+                <p className="text-xs opacity-70 max-w-sm mx-auto leading-relaxed">
+                  {lang === 'ar' ? 'يمكنك ضبط اللغة والمظهر العام وحسابات الربط من هنا.' : 'Customize system preferences, language, theme, and integration settings.'}
+                </p>
+                <div className="pt-3">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    {lang === 'ar' ? 'الحساب: مفعل ومعتمد ✓' : 'Account: Active & Verified ✓'}
+                  </span>
+                </div>
+              </div>
+            )}
           </main>
 
           {/* Live Preview Pane (only visible when showPreview is true, only on large screens) */}
