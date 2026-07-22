@@ -35,7 +35,7 @@ function SectionD({ t, education, onChange }: Props) {
   };
 
   const handleEduFileUpload = async (id: string, file: File) => {
-    const allowed = ['application/pdf', 'image/png', 'image/jpeg'];
+    const allowed = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
     if (!allowed.includes(file.type)) {
       alert(t.uploadOnlyTypes);
       return;

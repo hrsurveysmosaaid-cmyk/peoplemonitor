@@ -210,7 +210,11 @@ const generateAtsPdf = async (payload) => {
       const row3Parts = [];
       const nat       = safeText(data.personal?.nationality);
       const resStatus = safeText(data.personal?.residencyStatus);
-      const dob = [data.personal?.birthYear || '', data.personal?.birthMonth || ''].filter(Boolean).join('-');
+      const dobParts = [];
+      if (data.personal?.birthYear) dobParts.push(data.personal.birthYear);
+      if (data.personal?.birthMonth) dobParts.push(String(data.personal.birthMonth).padStart(2, '0'));
+      if (data.personal?.birthDay) dobParts.push(String(data.personal.birthDay).padStart(2, '0'));
+      const dob = dobParts.join('-');
       if (nat)       row3Parts.push(isArabic ? `الجنسية: ${nat}` : `Nationality: ${nat}`);
       if (dob)       row3Parts.push(isArabic ? `تاريخ الميلاد: ${dob}` : `Date of Birth: ${dob}`);
       if (resStatus) row3Parts.push(isArabic ? `الإقامة: ${resStatus}` : `Residency: ${resStatus}`);

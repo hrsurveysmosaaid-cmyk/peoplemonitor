@@ -122,7 +122,7 @@ function SectionC({ t, personal, experiences, onChange }: Props) {
 
     const handleFileUpload = async (id: string, file: File) => {
     // Client-side validation for UX (server enforces too)
-    const allowed = ['application/pdf', 'image/png', 'image/jpeg'];
+    const allowed = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
     if (!allowed.includes(file.type)) {
       alert(t.uploadOnlyTypes);
       return;

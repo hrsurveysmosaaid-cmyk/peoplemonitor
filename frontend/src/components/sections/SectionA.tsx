@@ -194,15 +194,20 @@ function SectionA({ t, personal, onChange }: Props) {
           <input
             className="input-field mt-2"
             type="date"
-            value={personal.birthYear ? `${personal.birthYear}-${String(personal.birthMonth || '01').padStart(2,'0')}-01` : ''}
+            value={personal.birthYear ? `${personal.birthYear}-${String(personal.birthMonth || '01').padStart(2,'0')}-${String(personal.birthDay || '01').padStart(2,'0')}` : ''}
             onChange={(e) => {
               const v = e.target.value;
               if (!v) {
-                onChange({ ...personal, birthYear: '', birthMonth: '' });
+                onChange({ ...personal, birthYear: '', birthMonth: '', birthDay: '' });
                 return;
               }
-              const [yy, mm] = v.split('-');
-              onChange({ ...personal, birthYear: yy || '', birthMonth: (mm || '').slice(0,2) });
+              const [yy, mm, dd] = v.split('-');
+              onChange({
+                ...personal,
+                birthYear: yy || '',
+                birthMonth: mm || '',
+                birthDay: dd || ''
+              });
             }}
           />
         </label>

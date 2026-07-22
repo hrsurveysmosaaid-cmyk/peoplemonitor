@@ -14,6 +14,7 @@ export type PersonalDetails = {
   nationality?: string;
   birthYear?: string;
   birthMonth?: string;
+  birthDay?: string;
   profileImageUrl: string;
   website: string;
   linkedin: string;

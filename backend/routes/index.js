@@ -176,9 +176,9 @@ const upload = multer({
   storage,
   limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB limit
   fileFilter: (req, file, cb) => {
-    const allowed = ['application/pdf', 'image/png', 'image/jpeg'];
+    const allowed = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
     if (allowed.includes(file.mimetype)) return cb(null, true);
-    const err = new Error('Invalid file type. Only PDF, PNG, and JPG are allowed.');
+    const err = new Error('Invalid file type. Only PDF, PNG, JPG, WEBP, and GIF are allowed.');
     err.statusCode = 400;
     return cb(err);
   }
@@ -820,6 +820,8 @@ router.get('/assets/signed', asyncHandler(async (req, res) => {
   const mime = ext === '.pdf' ? 'application/pdf'
     : ext === '.png' ? 'image/png'
     : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg'
+    : ext === '.webp' ? 'image/webp'
+    : ext === '.gif' ? 'image/gif'
     : 'application/octet-stream';
 
   const buf = fs.readFileSync(filePath);

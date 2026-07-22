@@ -164,9 +164,13 @@ export default function PublicPortfolioPageV2() {
   const birthDisplay = useMemo(() => {
     const yy = personal?.birthYear as string | undefined;
     const mm = (personal?.birthMonth as string | undefined) || '';
+    const dd = (personal?.birthDay as string | undefined) || '';
     if (!yy) return '';
-    return mm ? `${yy}-${String(mm).padStart(2,'0')}` : yy;
-  }, [personal?.birthYear, personal?.birthMonth]);
+    if (mm) {
+      return dd ? `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}` : `${yy}-${String(mm).padStart(2,'0')}`;
+    }
+    return yy;
+  }, [personal?.birthYear, personal?.birthMonth, personal?.birthDay]);
 
   if (loading) {
     return (
