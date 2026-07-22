@@ -275,6 +275,9 @@ export default function DashboardPage() {
     setTimeout(() => setUrlCopied(false), 2000);
   };
 
+  const userName = localStorage.getItem('userName') || workstationData.personal.fullName || (lang === 'ar' ? 'المستخدم' : 'User');
+  const [activeNavTab, setActiveNavTab] = useState<'profile' | 'ats' | 'settings'>('profile');
+
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${isDark ? 'bg-[#060818] text-slate-100' : 'bg-[#f4f6fb] text-slate-900'}`}
@@ -290,128 +293,56 @@ export default function DashboardPage() {
 
         {/* ── STICKY TOP NAV ── */}
         <header className={`sticky top-4 z-50 mx-0 mt-4 mb-6 rounded-2xl border px-4 sm:px-6 py-3 shadow-xl backdrop-blur-2xl transition-all duration-300 ${isDark ? 'border-white/[0.07] bg-slate-900/80' : 'border-white bg-white/90 shadow-slate-200/60'}`}>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
 
-            {/* Brand */}
+            {/* Brand & User Name */}
             <div className="flex items-center gap-3 min-w-0">
               <div className={`p-2 rounded-xl flex-shrink-0 ${isDark ? 'bg-sky-500/15 ring-1 ring-sky-500/25' : 'bg-sky-50 ring-1 ring-sky-200'}`}>
                 <Cpu size={18} className="text-sky-500" />
               </div>
-              <div className="hidden sm:block min-w-0">
-                <p className="text-sky-500 text-[9px] uppercase tracking-[0.25em] font-black">PeopleOS Workstation</p>
-                <h1 className={`text-sm font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{t.title}</h1>
+              <div className="min-w-0">
+                <p className="text-sky-500 text-[9px] uppercase tracking-[0.2em] font-black">PeopleOS Workstation</p>
+                <h1 className={`text-sm font-black truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{userName}</h1>
               </div>
             </div>
 
-            {/* Status + Actions */}
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-
-              {/* Save status pill (Hidden when it's just 'Loaded from database') */}
-              {(saveState !== 'idle' || (saveLabel && saveLabel !== 'Loaded from database')) && (
-                <span className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all ${
-                  saveState === 'saving' ? isDark ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-200'
-                  : saveState === 'saved' ? isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                  : saveState === 'error' ? isDark ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-red-50 text-red-600 border border-red-200'
-                  : isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-500 border border-slate-200'
-                }`}>
-                  {saveState === 'saving' && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
-                  {saveState === 'saved' && <CheckCircle2 size={11} />}
-                  {saveLabel}
-                </span>
-              )}
-
-              {/* Free guide */}
-              <a
-                href="https://t.me/HandbookDownloaded_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`hidden lg:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all ${isDark ? 'bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 border border-violet-500/20' : 'bg-violet-50 text-violet-600 hover:bg-violet-100 border border-violet-200'}`}
-              >
-                <Sparkles size={12} />
-                {t.freeGuideCta}
-              </a>
-
-              <div className={`hidden lg:block w-px h-4 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
-
-              {/* Save */}
+            {/* Navigation Tabs (3 Tabs) */}
+            <div className={`flex items-center p-1 rounded-xl border ${isDark ? 'bg-slate-950/50 border-white/10' : 'bg-slate-100 border-slate-200'}`}>
               <button
-                onClick={handleSaveDraft}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${
-                  saveState === 'saving'
-                    ? isDark ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25' : 'bg-amber-50 text-amber-600 border border-amber-200'
-                    : isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-                }`}
+                onClick={() => setActiveNavTab('profile')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeNavTab === 'profile' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
               >
-                <Save size={13} className={saveState === 'saving' ? 'animate-pulse' : ''} />
-                <span>{lang === 'ar' ? 'حفظ' : 'Save'}</span>
+                {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
+              </button>
+              <button
+                onClick={() => setActiveNavTab('ats')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeNavTab === 'ats' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                {lang === 'ar' ? 'فحص ATS' : 'ATS Checker'}
+              </button>
+              <button
+                onClick={() => setActiveNavTab('settings')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeNavTab === 'settings' ? 'bg-sky-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+              >
+                {lang === 'ar' ? 'الإعدادات' : 'Settings'}
+              </button>
+            </div>
+
+            {/* Right Controls + Upgrade Button */}
+            <div className="flex items-center gap-2">
+
+              {/* Upgrade Button */}
+              <button
+                onClick={() => alert(lang === 'ar' ? 'قريباً: الخطط الاحترافية والمميزات المتقدمة!' : 'Coming Soon: Pro Plans & Advanced Features!')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-105 transition-all duration-200"
+              >
+                <Sparkles size={13} className="animate-spin" style={{ animationDuration: '4s' }} />
+                <span>{lang === 'ar' ? 'ترقية الحساب' : 'Upgrade'}</span>
               </button>
 
-              {/* Published Link (Shortened, next to Publish) */}
-              {portfolioSlug && isPublished && (
-                <div className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
-                  <span className="max-w-[80px] sm:max-w-[120px] truncate" title={portfolioSlug}>
-                    {portfolioSlug.length > 12 ? `${portfolioSlug.slice(0, 10)}...` : portfolioSlug}
-                  </span>
-                  <div className="flex items-center gap-1 ml-1 flex-shrink-0">
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(`${window.location.origin}/p/${portfolioSlug}`);
-                        setSaveLabel(lang === 'ar' ? 'تم نسخ الرابط!' : 'Link copied!');
-                        setTimeout(() => setSaveLabel(''), 2000);
-                      }}
-                      className="hover:scale-110 transition-transform p-0.5"
-                      title={lang === 'ar' ? 'نسخ الرابط' : 'Copy Link'}
-                    >
-                      <Copy size={11} />
-                    </button>
-                    <a
-                      href={`/p/${portfolioSlug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:scale-110 transition-transform p-0.5 text-inherit"
-                    >
-                      <ExternalLink size={11} />
-                    </a>
-                  </div>
-                </div>
-              )}
+              <div className={`hidden sm:block w-px h-4 ${isDark ? 'bg-white/10' : 'bg-slate-200'}`} />
 
-              {/* Publish */}
-              <button
-                onClick={() => setShowPublish(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30 hover:-translate-y-px transition-all duration-200 active:scale-95"
-              >
-                <UploadCloud size={13} />
-                <span>{lang === 'ar' ? 'نشر' : 'Publish'}</span>
-              </button>
-
-              {/* Preview Toggle */}
-              <button
-                onClick={() => { setShowPreview(p => !p); setPreviewKey(k => k + 1); }}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${
-                  showPreview
-                    ? isDark ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-sky-100 text-sky-700 border border-sky-300'
-                    : isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-                }`}
-                title={showPreview ? (lang === 'ar' ? 'إخفاء المعاينة' : 'Hide preview') : (lang === 'ar' ? 'معاينة حية' : 'Live preview')}
-              >
-                {showPreview ? <LayoutTemplate size={13} /> : <Eye size={13} />}
-                <span className="hidden sm:inline">{showPreview ? (lang === 'ar' ? 'إخفاء' : 'Hide') : (lang === 'ar' ? 'معاينة' : 'Preview')}</span>
-              </button>
-
-              {/* Export */}
-              <button
-                onClick={handleExportPDF}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'}`}
-              >
-                <FileDown size={13} />
-                <span>{lang === 'ar' ? 'تصدير' : 'Export'}</span>
-              </button>
-
-              <div className="w-px h-4 bg-white/10" />
-
-              {/* Theme */}
+              {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
                 className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border border-slate-200'}`}
@@ -421,7 +352,7 @@ export default function DashboardPage() {
                 {isDark ? <Sun size={13} className="text-amber-400" /> : <Moon size={13} className="text-indigo-500" />}
               </button>
 
-              {/* Language */}
+              {/* Language Toggle */}
               <button
                 onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
                 className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200 ${isDark ? 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-slate-200 border border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 border border-slate-200'}`}
@@ -496,6 +427,115 @@ export default function DashboardPage() {
             id="cv-content-workstation"
             className={`grid gap-5 flex-1 min-w-0 transition-all duration-300 ${showPreview ? 'lg:max-w-[55%]' : ''}`}
           >
+            {/* ── MY PROFILE ACTIONS SECTION ── */}
+            <section className={`glass-card p-5 rounded-3xl border transition-all ${isDark ? 'border-sky-500/20 bg-sky-500/5' : 'border-sky-200 bg-sky-50/50'}`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <PenLine size={18} className="text-sky-500" />
+                    <h2 className="text-lg font-black">{lang === 'ar' ? 'ملفي الشخصي (My Profile)' : 'My Profile'}</h2>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {lang === 'ar' ? 'إدارة وتحرير وحفظ ونشر حقيبتك المهنية والتفاعلية' : 'Manage, edit, save, and publish your professional portfolio'}
+                  </p>
+                </div>
+
+                {/* Save status pill */}
+                {(saveState !== 'idle' || (saveLabel && saveLabel !== 'Loaded from database')) && (
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold ${
+                    saveState === 'saving' ? isDark ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-amber-50 text-amber-600 border border-amber-200'
+                    : saveState === 'saved' ? isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                    : saveState === 'error' ? isDark ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-red-50 text-red-600 border border-red-200'
+                    : isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                  }`}>
+                    {saveState === 'saving' && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
+                    {saveState === 'saved' && <CheckCircle2 size={11} />}
+                    {saveLabel}
+                  </span>
+                )}
+              </div>
+
+              {/* Controls Grid */}
+              <div className="flex items-center justify-between gap-3 mt-4 pt-4 border-t border-slate-500/15 flex-wrap">
+                {/* Action Buttons: Save, Publish, Preview, Export */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Save */}
+                  <button
+                    onClick={handleSaveDraft}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${
+                      saveState === 'saving'
+                        ? isDark ? 'bg-amber-500/15 text-amber-400 border border-amber-500/25' : 'bg-amber-50 text-amber-600 border border-amber-200'
+                        : isDark ? 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10' : 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-sm'
+                    }`}
+                  >
+                    <Save size={13} className={saveState === 'saving' ? 'animate-pulse' : ''} />
+                    <span>{lang === 'ar' ? 'حفظ' : 'Save'}</span>
+                  </button>
+
+                  {/* Publish */}
+                  <button
+                    onClick={() => setShowPublish(true)}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30 hover:-translate-y-px transition-all duration-200 active:scale-95"
+                  >
+                    <UploadCloud size={13} />
+                    <span>{lang === 'ar' ? 'نشر' : 'Publish'}</span>
+                  </button>
+
+                  {/* Preview Toggle */}
+                  <button
+                    onClick={() => { setShowPreview(p => !p); setPreviewKey(k => k + 1); }}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${
+                      showPreview
+                        ? isDark ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-sky-100 text-sky-700 border border-sky-300'
+                        : isDark ? 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10' : 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-sm'
+                    }`}
+                    title={showPreview ? (lang === 'ar' ? 'إخفاء المعاينة' : 'Hide preview') : (lang === 'ar' ? 'معاينة حية' : 'Live preview')}
+                  >
+                    {showPreview ? <LayoutTemplate size={13} /> : <Eye size={13} />}
+                    <span>{showPreview ? (lang === 'ar' ? 'إخفاء المعاينة' : 'Hide Preview') : (lang === 'ar' ? 'معاينة حية' : 'Live Preview')}</span>
+                  </button>
+
+                  {/* Export */}
+                  <button
+                    onClick={handleExportPDF}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 ${isDark ? 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10' : 'bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-sm'}`}
+                  >
+                    <FileDown size={13} />
+                    <span>{lang === 'ar' ? 'تصدير' : 'Export'}</span>
+                  </button>
+                </div>
+
+                {/* Published Link Box */}
+                {portfolioSlug && isPublished && (
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${isDark ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                    <span className="font-mono">{portfolioSlug}</span>
+                    <div className="flex items-center gap-1.5 border-l border-emerald-500/20 pl-2 ml-1">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/p/${portfolioSlug}`);
+                          setSaveLabel(lang === 'ar' ? 'تم نسخ الرابط!' : 'Link copied!');
+                          setTimeout(() => setSaveLabel(''), 2000);
+                        }}
+                        className="hover:scale-110 transition-transform p-1"
+                        title={lang === 'ar' ? 'نسخ الرابط' : 'Copy Link'}
+                      >
+                        <Copy size={13} />
+                      </button>
+                      <a
+                        href={`/p/${portfolioSlug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:scale-110 transition-transform p-1 text-inherit"
+                        title={lang === 'ar' ? 'فتح البورتفوليو' : 'Open Portfolio'}
+                      >
+                        <ExternalLink size={13} />
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
             <SectionA
               t={t}
               personal={workstationData.personal}
