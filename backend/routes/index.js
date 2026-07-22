@@ -11,6 +11,7 @@ const pdfController = require('../controllers/pdfController');
 const endorsementController = require('../controllers/endorsementController');
 const adminController = require('../controllers/adminController');
 const partnerController = require('../controllers/partnerController');
+const { atsAnalyze, linkedinAnalyze, upload: caUpload } = require('../controllers/careerAssistantController');
 const CorePortfoliosModel = require('../models/CorePortfolios');
 const PortfolioExperienceBlocksModel = require('../models/PortfolioExperienceBlocks');
 const ExternalLiveEndorsementsModel = require('../models/ExternalLiveEndorsements');
@@ -830,5 +831,16 @@ router.get('/assets/signed', asyncHandler(async (req, res) => {
   return res.json({ success: true, url: `data:${mime};base64,${b64}` });
 }));
 
+// ============================================
+// Career Assistant (OpenAI-powered)
+// ============================================
+
+// POST /api/career-assistant/ats  — ATS resume vs JD matching
+router.post('/career-assistant/ats', authenticate, caUpload.single('resume'), asyncHandler(atsAnalyze));
+
+// POST /api/career-assistant/linkedin  — LinkedIn profile optimizer
+router.post('/career-assistant/linkedin', authenticate, caUpload.single('profile'), asyncHandler(linkedinAnalyze));
+
 module.exports = router;
+
 

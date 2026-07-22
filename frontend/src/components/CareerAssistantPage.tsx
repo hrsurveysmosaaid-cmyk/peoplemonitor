@@ -37,98 +37,71 @@ export default function CareerAssistantPage() {
   const [linkedinAnalyzing, setLinkedinAnalyzing] = useState(false);
   const [linkedinResult, setLinkedinResult] = useState<AnalysisResult | null>(null);
 
-  // ATS Analysis Handler
-  const handleAtsAnalysis = (e: React.FormEvent) => {
+  const [atsError, setAtsError] = useState('');
+  const [linkedinError, setLinkedinError] = useState('');
+
+  // ATS Analysis Handler — real OpenAI API
+  const handleAtsAnalysis = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!atsFile && !jobDescription.trim()) return;
 
     setAtsAnalyzing(true);
     setAtsResult(null);
+    setAtsError('');
 
-    // Simulated AI analysis response with rich report
-    setTimeout(() => {
-      setAtsResult({
-        score: 84,
-        summary: lang === 'ar' 
-          ? 'تظهر السيرة الذاتية توافقاً جيداً جداً مع متطلبات الوظيفة الشاغرة. تبرز نقاط القوة في المهارات التقنية، وتتطلب صياغة النتائج في بعض الخبرات مزيداً من التحديد الرقمي.'
-          : 'Your resume shows a strong alignment with the target job description. Key technical skills match well, while metric-driven outcomes in experience sections could be strengthened.',
-        strengths: lang === 'ar' ? [
-          'استخدام مصطلحات تقنية دقيقة متوافقة مع أنظمة ATS.',
-          'وضوح الهيكلية والتسلسل الزمني للخبرات.',
-          'تضمين المهارات البرمجية الأساسية المطلوبة في الوصف الوظيفي.'
-        ] : [
-          'High relevance of core technical terms matched with ATS parsing engine.',
-          'Clean structural layout and clear chronological progression.',
-          'Included primary framework and language requirements mentioned in JD.'
-        ],
-        improvements: lang === 'ar' ? [
-          'إضافة أرقام ونتائج قياسية (مثال: زيادة الإنتاجية بنسبة 25%).',
-          'تعزيز الكلمات المفتاحية الناقصة في قسم الملخص المهني.',
-          'استبدال بعض الجمل العامة بأفعال حركة أكثر قوة (Action Verbs).'
-        ] : [
-          'Quantify accomplishments with metrics and percentages (e.g., boosted efficiency by 25%).',
-          'Integrate missing key phrases into the Professional Summary.',
-          'Replace passive phrases with strong action-oriented verbs.'
-        ],
-        missingKeywords: ['CI/CD Pipelines', 'Agile/Scrum Leadership', 'System Architecture', 'Unit Testing Coverage'],
-        recommendations: lang === 'ar' ? [
-          'قم بإضافة مصطلح "CI/CD Pipelines" في قسم الخبرات العملية.',
-          'اعد صياغة الملخص المهني ليركز على حلول البرمجيات السحابية.',
-          'تأكد من مطابقة مسمى الوظيفة الحالي للمسمى المطلوب في الشاغر.'
-        ] : [
-          'Add "CI/CD Pipelines" explicitly under your main software developer experience block.',
-          'Tailor the summary section towards Cloud-native Architecture.',
-          'Ensure target Job Title aligns closely with the job description title.'
-        ]
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      if (atsFile) formData.append('resume', atsFile);
+      formData.append('jobDescription', jobDescription);
+      formData.append('lang', lang);
+
+      const res = await fetch('/api/career-assistant/ats', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Analysis failed');
+      setAtsResult(json.data);
+    } catch (err: any) {
+      setAtsError(err.message || 'Unexpected error');
+    } finally {
       setAtsAnalyzing(false);
-    }, 2500);
+    }
   };
 
-  // LinkedIn Analysis Handler
-  const handleLinkedinAnalysis = (e: React.FormEvent) => {
+  // LinkedIn Analysis Handler — real OpenAI API
+  const handleLinkedinAnalysis = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!linkedinUrl.trim() && !linkedinFile) return;
 
     setLinkedinAnalyzing(true);
     setLinkedinResult(null);
+    setLinkedinError('');
 
-    setTimeout(() => {
-      setLinkedinResult({
-        score: 78,
-        summary: lang === 'ar'
-          ? 'بروفايل لينكد إن ممتاز ويحتوي على عناصر أساسية قوية. نقترح تحسين العنوان الرئيسي (Headline) وقسم "عنّي" (About) لجذب مسؤولي التوظيف بشكل أكفأ.'
-          : 'Your LinkedIn profile carries solid foundation elements. Enhancing your Headline and About section will significantly increase recruiter outreach.',
-        strengths: lang === 'ar' ? [
-          'وجود صورة شخصية وصورة غلاف احترافيتين.',
-          'توثيق الخبرات السابقة مع المسميات الوظيفية بشكل دقيق.',
-          'تنوع قسم المهارات والتوصيات.'
-        ] : [
-          'Professional headshot and clean banner presentation.',
-          'Detailed role descriptions and accurate title history.',
-          'Well-populated skills matrix and endorsements.'
-        ],
-        improvements: lang === 'ar' ? [
-          'تحديث العنوان الرئيسي ليحتوي القيمة المضافة وليس فقط المسمى الوظيفي.',
-          'كتابة قسم "عنّي" بصيغة السرد القصصي المهني (Storytelling).',
-          'زيادة التفاعل اليومي ونشر المحتوى في مجال تخصصك.'
-        ] : [
-          'Transform Headline from a basic job title to a value-proposition statement.',
-          'Craft a compelling, first-person narrative in the About section.',
-          'Boost visibility through consistent industry posts and engagement.'
-        ],
-        recommendations: lang === 'ar' ? [
-          'غيّر العنوان الرئيسي إلى: "Senior Software Engineer | Building Scalable SaaS Solutions".',
-          'أضف خيار "Open to Work" الموجه لمسؤولي التوظيف فقط (Recruiters Only).',
-          'اطلب توصيتين مهنيتين إضافيتين من مدراء سابقين عبر المنصة.'
-        ] : [
-          'Update Headline to: "Senior Software Engineer | Building Scalable SaaS Solutions".',
-          'Enable "Open to Work" visible exclusively to recruiters.',
-          'Request 2 additional verified recommendations via PeopleOS.'
-        ]
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      if (linkedinFile) formData.append('profile', linkedinFile);
+      formData.append('profileUrl', linkedinUrl);
+      formData.append('lang', lang);
+
+      const res = await fetch('/api/career-assistant/linkedin', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Analysis failed');
+      setLinkedinResult(json.data);
+    } catch (err: any) {
+      setLinkedinError(err.message || 'Unexpected error');
+    } finally {
       setLinkedinAnalyzing(false);
-    }, 2500);
+    }
   };
 
   return (
@@ -240,6 +213,14 @@ export default function CareerAssistantPage() {
                   }`}
                 />
               </div>
+
+              {/* Error Display */}
+              {atsError && (
+                <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold flex items-center gap-2">
+                  <AlertCircle size={14} className="flex-shrink-0" />
+                  <span>{atsError}</span>
+                </div>
+              )}
 
               {/* Submit Button */}
               <button
@@ -408,6 +389,14 @@ export default function CareerAssistantPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Error Display */}
+              {linkedinError && (
+                <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold flex items-center gap-2">
+                  <AlertCircle size={14} className="flex-shrink-0" />
+                  <span>{linkedinError}</span>
+                </div>
+              )}
 
               {/* Submit Button */}
               <button
