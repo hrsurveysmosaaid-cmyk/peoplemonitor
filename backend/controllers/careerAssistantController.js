@@ -1,4 +1,4 @@
-﻿// backend/controllers/careerAssistantController.js
+// backend/controllers/careerAssistantController.js
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
@@ -96,12 +96,18 @@ const atsAnalyze = async (req, res) => {
 
     const langInstruction = lang === 'ar' ? 'Respond in Arabic.' : 'Respond in English.';
 
-    const systemPrompt = `You are an expert ATS (Applicant Tracking System) resume analyst and career coach. Analyze the given resume against the job description and return a detailed JSON report. ${langInstruction}
+    const systemPrompt = `You are an expert ATS (Applicant Tracking System) resume analyst and global talent matching consultant. 
+Analyze the given resume against the provided JOB INFORMATION (which may be a full Job Description OR just a Job Title / Target Role). 
+
+Instructions:
+1. If only a Job Title / Target Role is provided (e.g. "Senior Frontend Developer"), evaluate the resume against global standard ATS requirements, industry benchmarks, key skills, and best practices for that specific job title.
+2. If a full Job Description is provided, analyze the direct match, key keyword overlap, required qualifications, and structural alignment between the resume and the job description.
+3. ${langInstruction}
 
 Return this exact JSON structure:
 {
   "score": <integer 0-100>,
-  "summary": "<2-3 sentence AI analysis>",
+  "summary": "<2-3 sentence AI analysis detailing ATS compatibility and target role match>",
   "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
   "improvements": ["<improvement 1>", "<improvement 2>", "<improvement 3>"],
   "missingKeywords": ["<keyword 1>", "<keyword 2>", "<keyword 3>", "<keyword 4>"],
@@ -112,7 +118,7 @@ Return this exact JSON structure:
       { role: 'system', content: systemPrompt },
       {
         role: 'user',
-        content: `RESUME:\n${resumeText}\n\n---\n\nJOB DESCRIPTION:\n${jobDescription}`,
+        content: `RESUME:\n${resumeText}\n\n---\n\nJOB INFORMATION (JOB TITLE OR FULL JD):\n${jobDescription}`,
       },
     ], apiKey);
 
@@ -179,4 +185,65 @@ Return this exact JSON structure:
   }
 };
 
-module.exports = { atsAnalyze, linkedinAnalyze, upload };
+// ── Cover Letter Generator ───────────────────────────────────────────────────
+
+const generateCoverLetter = async (req, res) => {
+  try {
+    const apiKey = getOpenAI();
+    const { applicantName, companyName, jobTitle, additionalNotes, lang } = req.body || {};
+
+    let resumeText = '';
+    if (req.file) {
+      const b64 = pdfToBase64(req.file.path);
+      fs.unlinkSync(req.file.path);
+
+      const extractResult = await callOpenAI([
+        {
+          role: 'system',
+          content: 'You are a PDF text extractor. Extract all text content from the provided base64-encoded resume PDF and return it as JSON: { "text": "..." }.',
+        },
+        {
+          role: 'user',
+          content: `Base64 PDF:\n${b64.substring(0, 12000)}`,
+        },
+      ], apiKey);
+
+      resumeText = extractResult?.text || '';
+    }
+
+    const langInstruction = lang === 'ar' ? 'Write the cover letter in professional Arabic.' : 'Write the cover letter in professional English.';
+
+    const systemPrompt = `You are a professional executive resume and cover letter writer. 
+Generate a compelling, highly personalized, and professional Cover Letter based on the applicant's resume (if provided) and job application details.
+
+${langInstruction}
+
+Return this exact JSON structure:
+{
+  "coverLetter": "<Full formatted professional cover letter text with greetings, body paragraphs, and sign-off>",
+  "tips": ["<tip 1>", "<tip 2>", "<tip 3>"]
+}`;
+
+    const userInput = `
+Applicant Name: ${applicantName || 'Applicant'}
+Target Company Name: ${companyName || 'Target Company'}
+Target Job Title: ${jobTitle || 'Target Position'}
+Additional Notes / Highlights: ${additionalNotes || 'None'}
+
+Applicant Resume / background context:
+${resumeText || 'No resume PDF uploaded, write based on position and standard top-tier applicant qualifications.'}
+`;
+
+    const result = await callOpenAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userInput },
+    ], apiKey);
+
+    return res.json({ success: true, data: result });
+  } catch (err) {
+    console.error('[CareerAssistant/CoverLetter]', err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+module.exports = { atsAnalyze, linkedinAnalyze, generateCoverLetter, upload };

@@ -11,7 +11,7 @@ const pdfController = require('../controllers/pdfController');
 const endorsementController = require('../controllers/endorsementController');
 const adminController = require('../controllers/adminController');
 const partnerController = require('../controllers/partnerController');
-const { atsAnalyze, linkedinAnalyze, upload: caUpload } = require('../controllers/careerAssistantController');
+const { atsAnalyze, linkedinAnalyze, generateCoverLetter, upload: caUpload } = require('../controllers/careerAssistantController');
 const CorePortfoliosModel = require('../models/CorePortfolios');
 const PortfolioExperienceBlocksModel = require('../models/PortfolioExperienceBlocks');
 const ExternalLiveEndorsementsModel = require('../models/ExternalLiveEndorsements');
@@ -840,6 +840,9 @@ router.post('/career-assistant/ats', authenticate, caUpload.single('resume'), as
 
 // POST /api/career-assistant/linkedin  — LinkedIn profile optimizer
 router.post('/career-assistant/linkedin', authenticate, caUpload.single('profile'), asyncHandler(linkedinAnalyze));
+
+// POST /api/career-assistant/cover-letter  — Cover letter generator
+router.post('/career-assistant/cover-letter', authenticate, caUpload.single('resume'), asyncHandler(generateCoverLetter));
 
 module.exports = router;
 

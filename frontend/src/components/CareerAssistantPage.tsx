@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, Upload, Link as LinkIcon, Sparkles, CheckCircle2, AlertCircle, RefreshCw, FileCheck, ArrowRight } from 'lucide-react';
+import { Bot, Upload, Link as LinkIcon, Sparkles, CheckCircle2, AlertCircle, RefreshCw, FileCheck, ArrowRight, FileText, Copy, Download } from 'lucide-react';
 import { useUi } from '../ui/UiContext';
 
 const LinkedinIcon = ({ size = 18, className = '' }: { size?: number; className?: string }) => (
@@ -8,7 +8,7 @@ const LinkedinIcon = ({ size = 18, className = '' }: { size?: number; className?
   </span>
 );
 
-type ToolType = 'ats' | 'linkedin';
+type ToolType = 'ats' | 'linkedin' | 'cover-letter';
 
 interface AnalysisResult {
   score: number;
@@ -17,6 +17,11 @@ interface AnalysisResult {
   improvements: string[];
   recommendations: string[];
   missingKeywords?: string[];
+}
+
+interface CoverLetterResult {
+  coverLetter: string;
+  tips: string[];
 }
 
 export default function CareerAssistantPage() {
@@ -37,8 +42,19 @@ export default function CareerAssistantPage() {
   const [linkedinAnalyzing, setLinkedinAnalyzing] = useState(false);
   const [linkedinResult, setLinkedinResult] = useState<AnalysisResult | null>(null);
 
+  // Cover Letter State
+  const [clApplicantName, setClApplicantName] = useState('');
+  const [clCompanyName, setClCompanyName] = useState('');
+  const [clJobTitle, setClJobTitle] = useState('');
+  const [clAdditionalNotes, setClAdditionalNotes] = useState('');
+  const [clFile, setClFile] = useState<File | null>(null);
+  const [clGenerating, setClGenerating] = useState(false);
+  const [clResult, setClResult] = useState<CoverLetterResult | null>(null);
+  const [clCopied, setClCopied] = useState(false);
+
   const [atsError, setAtsError] = useState('');
   const [linkedinError, setLinkedinError] = useState('');
+  const [clError, setClError] = useState('');
 
   // ATS Analysis Handler — real OpenAI API
   const handleAtsAnalysis = async (e: React.FormEvent) => {
@@ -104,6 +120,48 @@ export default function CareerAssistantPage() {
     }
   };
 
+  // Cover Letter Handler — real OpenAI API
+  const handleCoverLetterGeneration = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clJobTitle.trim() && !clCompanyName.trim()) return;
+
+    setClGenerating(true);
+    setClResult(null);
+    setClError('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      if (clFile) formData.append('resume', clFile);
+      formData.append('applicantName', clApplicantName);
+      formData.append('companyName', clCompanyName);
+      formData.append('jobTitle', clJobTitle);
+      formData.append('additionalNotes', clAdditionalNotes);
+      formData.append('lang', lang);
+
+      const res = await fetch('/api/career-assistant/cover-letter', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Generation failed');
+      setClResult(json.data);
+    } catch (err: any) {
+      setClError(err.message || 'Unexpected error');
+    } finally {
+      setClGenerating(false);
+    }
+  };
+
+  const copyCoverLetter = () => {
+    if (!clResult?.coverLetter) return;
+    navigator.clipboard.writeText(clResult.coverLetter);
+    setClCopied(true);
+    setTimeout(() => setClCopied(false), 2000);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Banner */}
@@ -119,14 +177,14 @@ export default function CareerAssistantPage() {
             </div>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">
               {lang === 'ar'
-                ? 'مساعدك الذكي الشخصي لتحليل توافق السيرة الذاتية مع الوظائف وتطوير بروفايل لينكد إن بأحدث تقنيات الـ AI.'
-                : 'Your personal AI consultant for ATS job matching analysis and LinkedIn profile optimization.'}
+                ? 'مساعدك الذكي الشخصي لتحليل توافق السيرة الذاتية مع الوظائف والمسميات الوظيفية، تطوير بروفايل لينكد إن، وتوليد رسائل التغطية الاحترافية (Cover Letter).'
+                : 'Your personal AI consultant for ATS job matching, LinkedIn profile optimization, and professional Cover Letter generation.'}
             </p>
           </div>
         </div>
 
         {/* Tool Selection Tabs */}
-        <div className="flex items-center gap-3 mt-6 pt-5 border-t border-slate-500/15">
+        <div className="flex items-center gap-3 mt-6 pt-5 border-t border-slate-500/15 flex-wrap">
           <button
             onClick={() => setActiveTool('ats')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
@@ -136,7 +194,7 @@ export default function CareerAssistantPage() {
             }`}
           >
             <FileCheck size={16} />
-            <span>{lang === 'ar' ? 'فحص مطابقة ATS' : 'ATS Resume Matcher'}</span>
+            <span>{lang === 'ar' ? 'فحص مطابقة ATS والوظائف' : 'ATS & Role Matcher'}</span>
           </button>
 
           <button
@@ -149,6 +207,18 @@ export default function CareerAssistantPage() {
           >
             <LinkedinIcon size={16} />
             <span>{lang === 'ar' ? 'تحليل بروفايل LinkedIn' : 'LinkedIn Optimizer'}</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTool('cover-letter')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+              activeTool === 'cover-letter'
+                ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/25 scale-[1.02]'
+                : isDark ? 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10' : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <FileText size={16} />
+            <span>{lang === 'ar' ? 'توليد خطّاب التغطية (Cover Letter)' : 'Cover Letter Generator'}</span>
           </button>
         </div>
       </div>
@@ -198,16 +268,16 @@ export default function CareerAssistantPage() {
                 </div>
               </div>
 
-              {/* Job Description Textarea */}
+              {/* Job Description / Job Title Textarea */}
               <div>
                 <label className="block text-xs font-bold mb-2">
-                  {lang === 'ar' ? '2. ضع الوصف الوظيفي المستهدف (Job Description)' : '2. Target Job Description'}
+                  {lang === 'ar' ? '2. المسمى الوظيفي أو التوصيف الوظيفي الكامل' : '2. Job Title or Full Job Description'}
                 </label>
                 <textarea
-                  rows={6}
+                  rows={5}
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
-                  placeholder={lang === 'ar' ? 'انسخ وانصق نص التوصيف الوظيفي للوظيفة التي ترغب بالتقديم عليها هنا...' : 'Paste the job requirements and description here...'}
+                  placeholder={lang === 'ar' ? 'اكتب المسمى الوظيفي (مثال: Senior Frontend Engineer) أو انسخ نص التوصيف الوظيفي الكامل ليقوم الـ AI بتحليل التطابق والتوافقية مع معايير ATS...' : 'Type a job title (e.g. Senior Frontend Engineer) OR paste full job description to compare ATS alignment & global standards...'}
                   className={`w-full p-3.5 rounded-2xl text-xs border outline-none transition-all resize-none ${
                     isDark ? 'bg-slate-950/60 border-white/10 focus:border-sky-500 text-slate-100' : 'bg-white border-slate-200 focus:border-sky-500 text-slate-900'
                   }`}
@@ -472,6 +542,214 @@ export default function CareerAssistantPage() {
                     ))}
                   </ul>
                 </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── TOOL 3: COVER LETTER GENERATOR ── */}
+      {activeTool === 'cover-letter' && (
+        <div className="grid lg:grid-cols-12 gap-6 items-start">
+          {/* Input Panel */}
+          <div className={`lg:col-span-6 glass-card p-6 rounded-3xl border ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-500/15">
+              <FileText size={18} className="text-sky-500" />
+              <h2 className="text-sm font-black">{lang === 'ar' ? 'بيانات توليد خطاب التغطية' : 'Cover Letter Details'}</h2>
+            </div>
+
+            <form onSubmit={handleCoverLetterGeneration} className="space-y-4">
+              {/* Applicant Name */}
+              <div>
+                <label className="block text-xs font-bold mb-1.5">
+                  {lang === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+                </label>
+                <input
+                  type="text"
+                  value={clApplicantName}
+                  onChange={(e) => setClApplicantName(e.target.value)}
+                  placeholder={lang === 'ar' ? 'مثال: أسامة المحمد' : 'e.g. Alex Morgan'}
+                  className={`w-full px-3.5 py-2.5 rounded-2xl text-xs border outline-none transition-all ${
+                    isDark ? 'bg-slate-950/60 border-white/10 focus:border-sky-500 text-slate-100' : 'bg-white border-slate-200 focus:border-sky-500 text-slate-900'
+                  }`}
+                />
+              </div>
+
+              {/* Target Company & Job Title Grid */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold mb-1.5">
+                    {lang === 'ar' ? 'اسم الشركة المستهدفة' : 'Target Company Name'} *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={clCompanyName}
+                    onChange={(e) => setClCompanyName(e.target.value)}
+                    placeholder={lang === 'ar' ? 'مثال: PeopleOS / Google' : 'e.g. Microsoft'}
+                    className={`w-full px-3.5 py-2.5 rounded-2xl text-xs border outline-none transition-all ${
+                      isDark ? 'bg-slate-950/60 border-white/10 focus:border-sky-500 text-slate-100' : 'bg-white border-slate-200 focus:border-sky-500 text-slate-900'
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1.5">
+                    {lang === 'ar' ? 'المنصب الوظيفي المستهدف' : 'Target Job Title'} *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={clJobTitle}
+                    onChange={(e) => setClJobTitle(e.target.value)}
+                    placeholder={lang === 'ar' ? 'مثال: Senior Product Designer' : 'e.g. Senior Software Engineer'}
+                    className={`w-full px-3.5 py-2.5 rounded-2xl text-xs border outline-none transition-all ${
+                      isDark ? 'bg-slate-950/60 border-white/10 focus:border-sky-500 text-slate-100' : 'bg-white border-slate-200 focus:border-sky-500 text-slate-900'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Resume PDF Upload (Optional) */}
+              <div>
+                <label className="block text-xs font-bold mb-1.5">
+                  {lang === 'ar' ? 'ارفع سيرتك الذاتية (PDF - اختياري لربط الخبرات)' : 'Upload Resume PDF (Optional for personalization)'}
+                </label>
+                <div className={`relative border-2 border-dashed rounded-2xl p-3 text-center transition-all ${
+                  clFile 
+                    ? isDark ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-emerald-400 bg-emerald-50'
+                    : isDark ? 'border-white/15 hover:border-sky-500/50 bg-white/5' : 'border-slate-300 hover:border-sky-400 bg-slate-50'
+                }`}>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => setClFile(e.target.files?.[0] || null)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="flex items-center justify-center gap-2 pointer-events-none">
+                    {clFile ? (
+                      <>
+                        <CheckCircle2 size={18} className="text-emerald-500" />
+                        <span className="text-xs font-bold truncate max-w-[200px] text-emerald-500">{clFile.name}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={18} className="text-sky-500" />
+                        <span className="text-xs font-semibold">{lang === 'ar' ? 'اضغط لرفع سيرتك الذاتية PDF' : 'Click to attach your Resume PDF'}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Notes */}
+              <div>
+                <label className="block text-xs font-bold mb-1.5">
+                  {lang === 'ar' ? 'ملاحظات أو إنجازات خاصة تُحب التركيز عليها' : 'Additional Notes / Key Highlights'}
+                </label>
+                <textarea
+                  rows={3}
+                  value={clAdditionalNotes}
+                  onChange={(e) => setClAdditionalNotes(e.target.value)}
+                  placeholder={lang === 'ar' ? 'مثال: أود التركيز على خبرتي في قيادة الفرق التقنية وزيادة المبيعات بنسبة 40%...' : 'e.g. Focus on my experience in team leadership and scaling SaaS apps...'}
+                  className={`w-full p-3 rounded-2xl text-xs border outline-none transition-all resize-none ${
+                    isDark ? 'bg-slate-950/60 border-white/10 focus:border-sky-500 text-slate-100' : 'bg-white border-slate-200 focus:border-sky-500 text-slate-900'
+                  }`}
+                />
+              </div>
+
+              {/* Error Display */}
+              {clError && (
+                <div className="p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold flex items-center gap-2">
+                  <AlertCircle size={14} className="flex-shrink-0" />
+                  <span>{clError}</span>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={clGenerating || (!clJobTitle.trim() && !clCompanyName.trim())}
+                className="w-full py-3 px-4 rounded-2xl text-xs font-extrabold bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 hover:scale-[1.01] transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2"
+              >
+                {clGenerating ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>{lang === 'ar' ? 'جاري توليد خطّاب التغطية الذكي...' : 'Crafting Cover Letter via AI...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={16} />
+                    <span>{lang === 'ar' ? 'توليد Cover Letter احترافي' : 'Generate Cover Letter'}</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Result Output Panel */}
+          <div className="lg:col-span-6">
+            {!clResult && !clGenerating && (
+              <div className={`p-10 rounded-3xl border border-dashed text-center flex flex-col items-center justify-center min-h-[420px] ${isDark ? 'border-white/10 text-slate-500' : 'border-slate-300 text-slate-400'}`}>
+                <FileText size={48} className="text-sky-500/40 mb-3" />
+                <h3 className="text-sm font-bold text-slate-300">{lang === 'ar' ? 'في انتظار إدخال البيانات' : 'Awaiting Cover Letter Inputs'}</h3>
+                <p className="text-xs max-w-xs mt-1 leading-relaxed">
+                  {lang === 'ar' ? 'أدخل اسم الشركة والمنصب واضغط توليد للحصول على خطاب تغطية مُصمم خصيصاً للوظيفة' : 'Fill in target job and company details to generate a highly tailored Cover Letter.'}
+                </p>
+              </div>
+            )}
+
+            {clGenerating && (
+              <div className={`p-12 rounded-3xl border text-center flex flex-col items-center justify-center min-h-[420px] ${isDark ? 'border-white/10 bg-slate-900/40' : 'border-slate-200 bg-white'}`}>
+                <div className="w-12 h-12 border-4 border-sky-500/30 border-t-sky-500 rounded-full animate-spin mb-4" />
+                <h3 className="text-sm font-bold">{lang === 'ar' ? 'جاري صياغة الخطاب بالأسلوب المهني المناسب...' : 'Writing Cover Letter & Personalizing Narrative...'}</h3>
+              </div>
+            )}
+
+            {clResult && !clGenerating && (
+              <div className={`space-y-4 glass-card p-6 rounded-3xl border ${isDark ? 'border-sky-500/20' : 'border-sky-200'}`}>
+                {/* Result Header & Copy Actions */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-500/15">
+                  <div className="flex items-center gap-2">
+                    <FileText size={18} className="text-sky-500" />
+                    <h3 className="text-sm font-extrabold">{lang === 'ar' ? 'خطاب التغطية المولد (Cover Letter)' : 'Generated Cover Letter'}</h3>
+                  </div>
+                  <button
+                    onClick={copyCoverLetter}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      clCopied 
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : isDark ? 'bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30' : 'bg-sky-100 hover:bg-sky-200 text-sky-700'
+                    }`}
+                  >
+                    {clCopied ? <CheckCircle2 size={13} /> : <Copy size={13} />}
+                    <span>{clCopied ? (lang === 'ar' ? 'تم النسخ!' : 'Copied!') : (lang === 'ar' ? 'نسخ النص' : 'Copy Text')}</span>
+                  </button>
+                </div>
+
+                {/* Formatted Cover Letter Output */}
+                <div className={`p-4 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap font-sans border max-h-[400px] overflow-y-auto ${
+                  isDark ? 'bg-slate-950/80 border-white/10 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-800'
+                }`}>
+                  {clResult.coverLetter}
+                </div>
+
+                {/* AI Application Tips */}
+                {clResult.tips && clResult.tips.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold text-sky-400 flex items-center gap-1.5 mb-2">
+                      <Sparkles size={14} />
+                      {lang === 'ar' ? 'نصائح لزيادة فرص القبول عند الإرسال' : 'AI Application Tips'}
+                    </h4>
+                    <ul className="space-y-1.5">
+                      {clResult.tips.map((tip: string, i: number) => (
+                        <li key={i} className="text-[11px] flex items-start gap-2 text-slate-300 bg-slate-900/40 p-2 rounded-xl border border-white/5">
+                          <ArrowRight size={13} className="text-sky-500 flex-shrink-0 mt-0.5" />
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
           </div>
