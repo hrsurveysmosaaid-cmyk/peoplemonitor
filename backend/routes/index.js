@@ -836,13 +836,13 @@ router.get('/assets/signed', asyncHandler(async (req, res) => {
 // ============================================
 
 // POST /api/career-assistant/ats  — ATS resume vs JD matching
-router.post('/career-assistant/ats', authenticate, caUpload.single('resume'), asyncHandler(atsAnalyze));
+router.post('/career-assistant/ats', authenticate(), caUpload.single('resume'), asyncHandler(atsAnalyze));
 
 // POST /api/career-assistant/linkedin  — LinkedIn profile optimizer
-router.post('/career-assistant/linkedin', authenticate, caUpload.single('profile'), asyncHandler(linkedinAnalyze));
+router.post('/career-assistant/linkedin', authenticate(), caUpload.single('profile'), asyncHandler(linkedinAnalyze));
 
 // POST /api/career-assistant/cover-letter  — Cover letter generator
-router.post('/career-assistant/cover-letter', authenticate, caUpload.single('resume'), asyncHandler(generateCoverLetter));
+router.post('/career-assistant/cover-letter', authenticate(), caUpload.single('resume'), asyncHandler(generateCoverLetter));
 
 module.exports = router;
 
