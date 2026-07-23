@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUi } from '../ui/UiContext';
-import { Languages, Moon, Sun } from 'lucide-react';
+import { Languages, Moon, Sun, Eye, EyeOff } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   const { t, theme, toggleTheme, lang, setLang } = useUi();
@@ -10,6 +10,8 @@ export default function ResetPasswordPage() {
   const [token, setToken] = useState<string>('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
@@ -118,16 +120,26 @@ export default function ResetPasswordPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <label className="block">
             <span className="text-slate-300 text-sm font-medium">{t.newPassword || 'New Password'}</span>
-            <input
-              id="input-reset-new-password"
-              type="password"
-              required
-              className="input-field mt-2"
-              placeholder="••••••••"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              disabled={loading}
-            />
+            <div className="relative flex items-center mt-2">
+              <input
+                id="input-reset-new-password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                className="input-field pr-10"
+                placeholder="••••••••"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 text-slate-400 hover:text-slate-200 transition-colors p-1"
+                title={showPassword ? (lang === 'ar' ? 'إخفاء كلمة المرور' : 'Hide password') : (lang === 'ar' ? 'إظهار كلمة المرور' : 'Show password')}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </label>
 
           <label className="block">
@@ -135,16 +147,26 @@ export default function ResetPasswordPage() {
               <span className="text-slate-300 text-sm font-medium">{t.confirmNewPassword || 'Confirm New Password'}</span>
               <span className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{t.passwordRequirements || 'Must include uppercase, lowercase letters, and a number'}</span>
             </div>
-            <input
-              id="input-reset-confirm-password"
-              type="password"
-              required
-              className="input-field mt-2"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={loading}
-            />
+            <div className="relative flex items-center mt-2">
+              <input
+                id="input-reset-confirm-password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                required
+                className="input-field pr-10"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 text-slate-400 hover:text-slate-200 transition-colors p-1"
+                title={showConfirmPassword ? (lang === 'ar' ? 'إخفاء كلمة المرور' : 'Hide password') : (lang === 'ar' ? 'إظهار كلمة المرور' : 'Show password')}
+              >
+                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </label>
 
           <button

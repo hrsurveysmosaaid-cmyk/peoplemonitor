@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUi } from '../ui/UiContext';
 import {
   Building2, Moon, Sun, Languages, Mail, Lock,
-  ArrowRight, AlertCircle, Sparkles, Shield
+  ArrowRight, AlertCircle, Sparkles, Shield, Eye, EyeOff
 } from 'lucide-react';
 
 export default function PartnerLoginPage() {
@@ -14,6 +14,7 @@ export default function PartnerLoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -133,7 +134,7 @@ export default function PartnerLoginPage() {
               <Lock size={15} className="text-slate-500 flex-shrink-0" />
               <input
                 id="input-partner-password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="••••••••"
                 value={password}
@@ -141,6 +142,14 @@ export default function PartnerLoginPage() {
                 disabled={loading}
                 className="flex-1 bg-transparent outline-none text-sm placeholder-slate-500"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-slate-400 hover:text-slate-200 transition-colors p-1"
+                title={showPassword ? (isAr ? 'إخفاء كلمة المرور' : 'Hide password') : (isAr ? 'إظهار كلمة المرور' : 'Show password')}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUi } from '../ui/UiContext';
-import { Languages, Moon, Sun } from 'lucide-react';
+import { Languages, Moon, Sun, Eye, EyeOff } from 'lucide-react';
 
 // Google "G" SVG icon for the OAuth button
 const GoogleIcon = () => (
@@ -22,6 +22,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Referral / Partner slug from URL ?ref=slug
@@ -254,30 +256,50 @@ export default function RegisterPage() {
 
               <label className="block">
                 <span className="text-slate-300 text-sm font-medium">{t.password || 'Password'} | Password</span>
-                <input
-                  id="input-signup-password"
-                  type="password"
-                  required
-                  className="input-field mt-2"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                />
+                <div className="relative flex items-center mt-2">
+                  <input
+                    id="input-signup-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    className="input-field pr-10"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 text-slate-400 hover:text-slate-200 transition-colors p-1"
+                    title={showPassword ? (lang === 'ar' ? 'إخفاء كلمة المرور' : 'Hide password') : (lang === 'ar' ? 'إظهار كلمة المرور' : 'Show password')}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </label>
 
               <label className="block">
                 <span className="text-slate-300 text-sm font-medium">{t.confirmPassword || 'Confirm password'}</span>
-                <input
-                  id="input-signup-confirm"
-                  type="password"
-                  required
-                  className="input-field mt-2"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={loading}
-                />
+                <div className="relative flex items-center mt-2">
+                  <input
+                    id="input-signup-confirm"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    className="input-field pr-10"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 text-slate-400 hover:text-slate-200 transition-colors p-1"
+                    title={showConfirmPassword ? (lang === 'ar' ? 'إخفاء كلمة المرور' : 'Hide password') : (lang === 'ar' ? 'إظهار كلمة المرور' : 'Show password')}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </label>
               <label className="flex items-start gap-2 cursor-pointer mt-4 select-none">
                 <input

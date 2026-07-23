@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUi } from '../ui/UiContext';
-import { Languages, Moon, Sun } from 'lucide-react';
+import { Languages, Moon, Sun, Eye, EyeOff } from 'lucide-react';
 
 // Google "G" SVG icon for the OAuth button
 const GoogleIcon = () => (
@@ -18,6 +18,7 @@ export default function LoginPage() {
   const isDark = theme === 'dark';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState('');
   const [showOtp, setShowOtp] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
@@ -303,16 +304,26 @@ export default function LoginPage() {
                         {t.forgotPassword || 'Forgot password?'}
                       </button>
                     </div>
-                    <input
-                      id="input-login-password"
-                      type="password"
-                      required
-                      className="input-field"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                    />
+                    <div className="relative flex items-center">
+                      <input
+                        id="input-login-password"
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        className="input-field pr-10"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 text-slate-400 hover:text-slate-200 transition-colors p-1"
+                        title={showPassword ? (lang === 'ar' ? 'إخفاء كلمة المرور' : 'Hide password') : (lang === 'ar' ? 'إظهار كلمة المرور' : 'Show password')}
+                      >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
                   </label>
 
                   <button
